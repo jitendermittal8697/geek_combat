@@ -1,0 +1,5 @@
+<ul class="friend-wrapper">
+  <% friends.forEach(function(friend){ %>
+    <%- include('friend', {friend: friend}); %>
+  <% }); %>
+</ul>

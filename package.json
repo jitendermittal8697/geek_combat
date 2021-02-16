@@ -1,0 +1,23 @@
+{
+  "name": "geek-combat",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "DEBUG=* supervisor app.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Guru99. <guru99@gmail.com> (http://Guru99.com)",
+  "license": "ISC",
+  "dependencies": {
+    "debug": "^4.3.1",
+    "ejs": "^3.1.6",
+    "express": "^4.17.1",
+    "path": "^0.12.7"
+  },
+  "devDependencies": {
+    "dotenv": "^8.2.0",
+    "supervisor": "^0.12.0"
+  }
+}

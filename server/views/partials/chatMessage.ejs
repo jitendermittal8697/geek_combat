@@ -1,0 +1,11 @@
+<% final_position = chat.position || 'right-msg' %>
+<div class="msg <%= final_position %>">
+    <div class="msg-img" style="background-image: url('<%= chat.image %>');"></div>
+    <div class="msg-bubble">
+        <div class="msg-info">
+            <div class="msg-info-name"><%= chat.name %></div>
+            <div class="msg-info-time"><%= chat.time %></div>
+        </div>
+        <div class="msg-text"><%= chat.message %></div>
+    </div>
+</div>
