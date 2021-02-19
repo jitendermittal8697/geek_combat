@@ -8,5 +8,6 @@ const MySocket = {
 };
 
 module.exports = {
-    MySocket
+    MySocket,
+    io
 }

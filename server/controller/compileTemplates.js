@@ -22,7 +22,6 @@ const compileFriendListTemplate = async (req, res) => {
         const friendListTemplate = ejs.compile(friendListFile, {
             filename: path
         })
-        console.log(req.session.userDetails, friendListFile);
         const html = friendListTemplate({ friends: userDetails })
         res.send({html: html})
     }
