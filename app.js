@@ -1,13 +1,15 @@
-const express = require('express');
+const expressApp = require('./server/utils/expressApp')();
+const app = expressApp.app;
+const express = expressApp.express;
+const http = expressApp.http;
+
 const session = require('express-session');
 const bodyParser = require('body-parser');
-const app = express()
 const path = require('path');
-const http = require('http').Server(app);
-const io = require('socket.io')(http);
+
 const { signup, login } = require('./server/controller/user');
-const { redirectUserCallback } = require('./server/middleware/restrictAccess')
-const { sign } = require('crypto');
+const { redirectUserCallback, checkSession } = require('./server/middleware/restrictAccess')
+const { compileFriendListTemplate } = require('./server/controller/compileTemplates')
 
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
@@ -30,25 +32,18 @@ app.use('/static', express.static(path.join(__dirname, '/server/public/css')))
 app.use('/images', express.static(path.join(__dirname, '/server/public/images')))
 
 
-app.post('/action', login(io))
-
-
+app.post('/action', login)
 app.get('/signup', redirectUserCallback)
 
-app.use(function (req, res, next) {
-    if (!req.session.userDetails) {
-        res.redirect('/signup');
-    }
-    else {
-        next()
-    }
-});
+app.use(checkSession);
 
 app.get('/chats', function (req, res) {
-    res.render('pages/index', { data: req.session });
+    res.render('pages/index', { appData: { name: process.env.APP_NAME}, data: req.session });
 })
 
-app.all('*', redirectUserCallback)
+app.post('/refresh-friend-list', compileFriendListTemplate)
+
+// app.all('*', redirectUserCallback)
 
 
 http.listen(PORT, function () {

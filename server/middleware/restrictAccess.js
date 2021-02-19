@@ -7,7 +7,16 @@ const redirectUserCallback = (req, res) => {
     }
 }
 
+const checkSession = (req, res, next) => {
+    if (!req.session.userDetails) {
+        res.redirect('/signup');
+    }
+    else {
+        next()
+    }
+}
 
 module.exports = {
-    redirectUserCallback
+    redirectUserCallback,
+    checkSession,
 }
