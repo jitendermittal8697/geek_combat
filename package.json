@@ -4,17 +4,25 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start": "DEBUG=* supervisor app.js",
+    "start": "supervisor app.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
   "author": "Guru99. <guru99@gmail.com> (http://Guru99.com)",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^1.19.0",
     "debug": "^4.3.1",
     "ejs": "^3.1.6",
     "express": "^4.17.1",
-    "path": "^0.12.7"
+    "express-session": "^1.17.1",
+    "express-validator": "^6.9.2",
+    "mssql": "^6.3.1",
+    "mysql2": "^2.2.5",
+    "path": "^0.12.7",
+    "sequelize": "^6.5.0",
+    "shortid": "^2.2.16",
+    "socket.io": "^3.1.1"
   },
   "devDependencies": {
     "dotenv": "^8.2.0",
