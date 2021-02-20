@@ -1,6 +1,6 @@
 const { User } = require('../model/user')
 const { io } = require('../utils/socket')
-const online_users = {};
+const { online_users } = require('../utils/onlineUser')
 
 const signup = async (req, res) => {
 
@@ -41,20 +41,21 @@ const login = async (req, res) => {
             let uuid = userDetails[0]["uuid"]
             req.session.userDetails = userDetails[0];
 
-            online_users[uuid] = {
-                "name": userDetails[0]["username"],
-                'uuid': uuid,
-            }
-
-            io.on('connection', (userDetails) => {
+            io.on('connection', (socket) => {
                 let uuid = userDetails[0]["uuid"];
-                return (socket) => {
-                    console.log(uuid + ' connected');
-                    socket.broadcast.emit('client_joined', {uuid: uuid});
-                    socket.on('disconnect', () => {
-                        console.log(uuid + ' disconnected');
-                    })
+
+                online_users[uuid] = {
+                    "name": userDetails[0]["username"],
+                    'uuid': uuid,
                 }
+
+                console.log(uuid + ' connected');
+                io.emit('client_connected', { uuid: uuid });
+                socket.on('disconnect', () => {
+                    delete online_users[uuid];
+                    io.emit('client_disconnected', { uuid: uuid });
+                    console.log(uuid + ' disconnected');
+                })
             });
 
             res.redirect('/chats');
