@@ -1,6 +1,7 @@
 const { User } = require('../model/user')
 const { io } = require('../utils/socket')
 const { online_users } = require('../utils/onlineUser')
+const { Sequelize } = require('sequelize');
 
 const signup = async (req, res) => {
 
@@ -53,7 +54,14 @@ const login = async (req, res) => {
                 io.emit('client_connected', { uuid: uuid });
                 socket.on('disconnect', () => {
                     delete online_users[uuid];
+                    UserModel.update({
+                        last_login: Sequelize.NOW,
+                    }, {
+                        where: { uuid: uuid }
+                    });
+
                     io.emit('client_disconnected', { uuid: uuid });
+
                     console.log(uuid + ' disconnected');
                 })
             });
