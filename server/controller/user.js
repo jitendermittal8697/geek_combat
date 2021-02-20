@@ -43,7 +43,6 @@ const login = async (req, res) => {
             req.session.userDetails = userDetails[0];
 
             io.on('connection', (socket) => {
-
                 online_users[uuid] = {
                     "name": userDetails[0]["username"],
                     'uuid': uuid,
@@ -59,7 +58,7 @@ const login = async (req, res) => {
                         where: { uuid: uuid }
                     });
 
-                    io.emit('client_disconnected', { uuid: uuid });
+                    socket.broadcast.emit('client_disconnected', { uuid: uuid });
 
                     console.log(uuid + ' disconnected');
                 })

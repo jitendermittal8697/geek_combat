@@ -68,8 +68,8 @@ const UserModel = async () => {
             timezone: 'Asia/Calcutta', dialectOptions: { timezone: 'Asia/Calcutta', },
         });
 
-        User.sync({ alter: true })
-        // User.sync()
+        // User.sync({ alter: true })
+        User.sync()
 
         return User;
 

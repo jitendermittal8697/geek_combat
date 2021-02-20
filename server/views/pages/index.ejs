@@ -1,38 +1,50 @@
 <!DOCTYPE html>
 <html>
-    <head>
-        <link rel="stylesheet" href="/static/style.css">
-
-    </head>
-<body>
-<div class="geek-combat chat-app">
-    <div class="left-wrap">
-        <% friends = data.online_users %>
-        <%- include('../partials/header', {appData: appData, userDetails: data.userDetails}); %>
-        <%- include('../partials/friendList', {friends: friends}); %>
-    </div>
-    <div class="right-wrap">
+  <head>
+    <link rel="stylesheet" href="/static/style.css" />
+  </head>
+  <body>
+    <div class="geek-combat chat-app">
+      <div class="left-wrap">
+        <% friends = data.online_users %> <%- include('../partials/header',
+        {appData: appData, userDetails: data.userDetails}); %> <%-
+        include('../partials/friendList', {friends: friends}); %>
+      </div>
+      <div class="right-wrap">
         <%- include('../partials/chatInterface', {friend: {}}); %>
+      </div>
     </div>
-</div>
-</body>
-<script src="/socket.io/socket.io.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js" integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg==" crossorigin="anonymous"></script>
-<script>
-    var socket = io({transports: ['websocket'], upgrade: false});
-    var refreshFriendList = function(socket) {
+  </body>
+  <script src="/socket.io/socket.io.js"></script>
+  <script
+    src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"
+    integrity="sha512-bLT0Qm9VnAYZDflyKcBaQ2gg0hSYNQrJ8RilYldYQ1FxQYoCLtUjuuRuZo+fjqhx/qtq/1itJ0C2ejDxltZVFg=="
+    crossorigin="anonymous"
+  ></script>
+  <script>
+    var socket = io({ transports: ["websocket"], upgrade: false });
+
+    var debounceRefreshFriendListTimeout = null;
+    var debounceRefreshFriendList = function () {
+
+      var refreshFriendList = function (socket) {
         $.ajax({
-            type: 'POST',
-            url: "/refresh-friend-list",
-            success: function (data) {
-                $( ".left-wrap .friend-wrapper" ).replaceWith(data.html);
-            },
-            error: function (error) {
-                console.log(error)
-            }
-        })
-    }
-    socket.on('client_connected', refreshFriendList);
-    socket.on('client_disconnected', refreshFriendList);
-</script>
+          type: "POST",
+          url: "/refresh-friend-list",
+          success: function (data) {
+            $(".left-wrap .friend-wrapper").replaceWith(data.html);
+          },
+          error: function (error) {
+            console.log(error);
+          },
+        });
+      };
+
+      clearTimeout(debounceRefreshFriendListTimeout);
+      debounceRefreshFriendListTimeout = setTimeout(refreshFriendList, 3000);
+    };
+
+    socket.on("client_connected", debounceRefreshFriendList);
+    socket.on("client_disconnected", debounceRefreshFriendList);
+  </script>
 </html>
