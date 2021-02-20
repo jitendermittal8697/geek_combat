@@ -43,7 +43,6 @@ const login = async (req, res) => {
             req.session.userDetails = userDetails[0];
 
             io.on('connection', (socket) => {
-                let uuid = userDetails[0]["uuid"];
 
                 online_users[uuid] = {
                     "name": userDetails[0]["username"],
@@ -52,10 +51,10 @@ const login = async (req, res) => {
 
                 console.log(uuid + ' connected');
                 io.emit('client_connected', { uuid: uuid });
-                socket.on('disconnect', () => {
+                socket.on('disconnect',async () => {
                     delete online_users[uuid];
-                    UserModel.update({
-                        last_login: Sequelize.NOW,
+                    await UserModel.update({
+                        last_login: new Date((new Date()).getTime() + 19800000),
                     }, {
                         where: { uuid: uuid }
                     });

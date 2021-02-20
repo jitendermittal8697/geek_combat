@@ -13,12 +13,10 @@ const UserModel = async () => {
                 defaultValue: Sequelize.UUIDV4,
                 allowNull: false,
                 primaryKey: true,
-                unique: true,
             },
             username: {
                 type: DataTypes.STRING,
                 allowNull: false,
-                unique: true,
             },
             profile_image: {
                 type: DataTypes.STRING,
@@ -59,10 +57,15 @@ const UserModel = async () => {
             last_login: {
                 type: Sequelize.DATE,
                 allowNull: false,
-                defaultValue: Sequelize.NOW
-            }
+                defaultValue: new Date((new Date()).getTime() - 19800000)
+            },
         }, {
-            tableName: 'users'
+            indexes: [
+                { unique: true, fields: ['username'] },
+                { unique: true, fields: ['uuid'] }
+            ],
+            tableName: 'users',
+            timezone: 'Asia/Calcutta', dialectOptions: { timezone: 'Asia/Calcutta', },
         });
 
         User.sync({ alter: true })
