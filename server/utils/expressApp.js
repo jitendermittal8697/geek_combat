@@ -7,7 +7,7 @@ let app;
 let server;
 module.exports = () => {
     app = app || express()
-    server = server || http.Server(app)
+    server = server || http.createServer(app)
     io = io || socketio(server)
     return {
         express,

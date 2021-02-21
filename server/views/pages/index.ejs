@@ -6,12 +6,12 @@
   <body>
     <div class="geek-combat chat-app">
       <div class="left-wrap">
-        <% friends = data.online_users %> <%- include('../partials/header',
-        {appData: appData, userDetails: data.userDetails}); %> <%-
-        include('../partials/friendList', {friends: friends}); %>
+        <% friends = data.online_users %>
+        <%- include('../partials/header', {appData: appData, userDetails: data.userDetails}); %>
+        <%- include('../partials/friendList', {friends: friends}); %>
       </div>
       <div class="right-wrap">
-        <%- include('../partials/chatInterface', {friend: {}}); %>
+        <%- include('../partials/chatInterface', {friend: {friends}, chats: []}); %>
       </div>
     </div>
   </body>
@@ -22,7 +22,7 @@
     crossorigin="anonymous"
   ></script>
   <script>
-    var socket = io({ transports: ["websocket"], upgrade: false });
+    var socket = io();
 
     var debounceRefreshFriendListTimeout = null;
     var debounceRefreshFriendList = function () {
@@ -44,7 +44,29 @@
       debounceRefreshFriendListTimeout = setTimeout(refreshFriendList, 3000);
     };
 
+    var debounceRefreshMessageTimeout = null;
+    var debounceRefreshMessage = function () {
+
+      var refreshMessageList = function (socket) {
+        $.ajax({
+          type: "POST",
+          url: "/refresh-message-list",
+          success: function (data1) {
+              console.log(data1)
+            $(".chat-interface-body").replaceWith(data1.html);
+          },
+          error: function (error) {
+            console.log(error);
+          },
+        });
+      };
+
+      clearTimeout(debounceRefreshMessageTimeout);
+      debounceRefreshMessageTimeout = setTimeout(refreshMessageList, 3000);
+    };
+
     socket.on("client_connected", debounceRefreshFriendList);
+    socket.on('client_connected', debounceRefreshMessage);
     socket.on("client_disconnected", debounceRefreshFriendList);
   </script>
 </html>

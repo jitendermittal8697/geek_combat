@@ -39,7 +39,7 @@ const ChatModel = async () => {
             timezone: 'Asia/Calcutta', dialectOptions: { timezone: 'Asia/Calcutta', },
         });
 
-        Chat.sync({ alter: true })
+        // Chat.sync({ alter: true })
         // Chat.sync()
 
         return Chat;

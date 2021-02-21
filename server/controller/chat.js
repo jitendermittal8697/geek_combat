@@ -1,29 +1,30 @@
 const { User } = require('../model/user')
+const { Chat } = require('../model/chat')
 const { io } = require('../utils/socket')
 const { online_users } = require('../utils/onlineUser')
 const { Sequelize } = require('sequelize');
 
-const signup = async (req, res) => {
+const sendMessage = async (req, res) => {
 
     try {
-        const userModel = await User();
+        const chatModel = await Chat();
 
         const userObj = {
-            username: req.body.username,
-            password: req.body.password,
-            gender: 'male',
-            profile_image: '/images/male_avatar.png',
+            from: req.body.from,
+            to: req.body.to,
+            msg_type: 'text',
+            message: req.body.message,
         }
 
-        await userModel.create(userObj)
-        login(req, res);
+        await chatModel.create(userObj)
+        // receiveMessage(req, res);
     }
     catch (error) {
         console.log(error);
     }
 }
 
-const login = async (req, res) => {
+const receiveMessage = async (req, res) => {
 
     try {
         let UserModel = await User();
@@ -42,7 +43,8 @@ const login = async (req, res) => {
             let uuid = userDetails[0]["uuid"]
             req.session.userDetails = userDetails[0];
 
-            io.off('connection', ()=>{}).on('connection', (socket) => {
+            io.on('connection', (socket) => {
+
                 online_users[uuid] = {
                     "name": userDetails[0]["username"],
                     'uuid': uuid,
@@ -50,7 +52,7 @@ const login = async (req, res) => {
 
                 console.log(uuid + ' connected');
                 io.emit('client_connected', { uuid: uuid });
-                socket.on('disconnect',async () => {
+                socket.on('disconnect', async () => {
                     delete online_users[uuid];
                     await UserModel.update({
                         last_login: new Date((new Date()).getTime() + 19800000),
@@ -58,7 +60,7 @@ const login = async (req, res) => {
                         where: { uuid: uuid }
                     });
 
-                    socket.broadcast.emit('client_disconnected', { uuid: uuid });
+                    io.emit('client_disconnected', { uuid: uuid });
 
                     console.log(uuid + ' disconnected');
                 })
@@ -76,6 +78,6 @@ const login = async (req, res) => {
 }
 
 module.exports = {
-    signup,
-    login,
+    sendMessage,
+    receiveMessage,
 }

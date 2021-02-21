@@ -8,8 +8,13 @@ const bodyParser = require('body-parser');
 const path = require('path');
 
 const { signup, login } = require('./server/controller/user');
+const { sendMessage, receiveMessage } = require('./server/controller/chat');
 const { redirectUserCallback, checkSession } = require('./server/middleware/restrictAccess')
-const { compileFriendListTemplate } = require('./server/controller/compileTemplates')
+const { compileFriendListTemplate, compileSingleChatTemplate } = require('./server/controller/compileTemplates')
+
+
+const { io } = require('./server/utils/socket')
+const { online_users } = require('./server/utils/onlineUser')
 
 if (process.env.NODE_ENV !== 'production') {
     require('dotenv').config();
@@ -38,10 +43,11 @@ app.get('/signup', redirectUserCallback)
 app.use(checkSession);
 
 app.get('/chats', function (req, res) {
-    res.render('pages/index', { appData: { name: process.env.APP_NAME}, data: req.session });
+    res.render('pages/index', { appData: { name: process.env.APP_NAME }, data: req.session });
 })
 
 app.post('/refresh-friend-list', compileFriendListTemplate)
+app.post('/refresh-message-list', compileSingleChatTemplate)
 
 // app.all('*', redirectUserCallback)
 

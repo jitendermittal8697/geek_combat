@@ -1,5 +1,6 @@
 const { Sequelize } = require('sequelize');
-const sequelize = new Sequelize('mysql://root:password@localhost:3306/geek_combat')
+const password = encodeURIComponent('password@123')
+const sequelize = new Sequelize(`mysql://root:${password}@localhost:3306/geek_combat`)
 
 var dbconn = async () => {
     try {
