@@ -38,30 +38,7 @@ const login = async (req, res) => {
         });
 
         if (userDetails.length) {
-
-            let uuid = userDetails[0]["uuid"]
             req.session.userDetails = userDetails[0];
-
-            io.sockets.on('connection', (socket) => {
-                online_users[uuid] = {
-                    "name": userDetails[0]["username"],
-                    'uuid': uuid,
-                }
-                io.emit('client_connected', { uuid: uuid });
-                socket.on('disconnect', async () => {
-                    delete online_users[uuid];
-                    await UserModel.update({
-                        last_login: new Date((new Date()).getTime() + 19800000),
-                    }, {
-                        where: { uuid: uuid }
-                    });
-
-                    socket.broadcast.emit('client_disconnected', { uuid: uuid });
-
-                    socket.disconnect(true)
-                })
-            });
-
             res.redirect('/chats');
         }
         else {

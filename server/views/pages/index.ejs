@@ -23,7 +23,7 @@
   ></script>
   <script>
     var socket = io({ transports: ["websocket"], upgrade: false });
-
+    socket.emit("client_joined", { uuid: $(".user-profile").data("uuid") });
     var debounceRefreshFriendListTimeout = null;
     var debounceRefreshFriendList = function (socket_data) {
       var refreshFriendList = function (socket_data) {

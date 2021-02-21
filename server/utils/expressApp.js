@@ -1,6 +1,7 @@
 const express = require('express');
 const http = require('http');
 const socketio = require('socket.io');
+var cookie = require("cookie");
 
 let io;
 let app;
@@ -13,6 +14,7 @@ module.exports = () => {
         express,
         app,
         http: server,
-        io
+        io,
+        cookie
     }
 }
