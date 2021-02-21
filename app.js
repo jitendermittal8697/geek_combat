@@ -10,12 +10,13 @@ const path = require('path');
 
 const { signup, login } = require('./server/controller/user');
 const { redirectUserCallback, checkSession } = require('./server/middleware/restrictAccess')
-const { compileFriendListTemplate } = require('./server/controller/compileTemplates')
-
+const { compileFriendListTemplate, compileSingleChatTemplate } = require('./server/controller/compileTemplates')
+const { sendMessage, receiveMessage } = require('./server/controller/chat');
 
 const { io } = require('./server/utils/socket')
 const { online_users } = require('./server/utils/onlineUser')
 const { User } = require('./server/model/user')
+const { Chat } = require('./server/model/chat')
 const _ = require('lodash')
 
 if (process.env.NODE_ENV !== 'production') {
@@ -49,6 +50,7 @@ app.get('/chats', function (req, res) {
 })
 
 app.post('/refresh-friend-list', compileFriendListTemplate)
+app.post('/refresh-message-list', compileSingleChatTemplate)
 
 // app.all('*', redirectUserCallback)
 io.on('connection', (socket) => {
@@ -56,14 +58,42 @@ io.on('connection', (socket) => {
     socket.on('client_joined', async (data) => {
 
         let userid = data.uuid;
+        let UserModel = await User();
+        let userDetails = await UserModel.findAll({
+            where: { uuid: userid }
+        });
+        // console.log(userDetails)
         online_users[userid] = {
             "uuid": userid,
-            "socket_id": socket.id
+            "socket_id": socket.id,
+            "username": userDetails[0].username,
+            "profile_image": userDetails[0].profile_image,
         }
 
-        socket.broadcast.emit('client_connected', {});
+        io.emit('client_connected', {});
         console.log("After Connection", online_users)
     })
+
+
+    socket.on('send_message', async (data) => {
+
+        const chatObj = {
+            from: '6e351c95-82a5-4576-9d81-2392b1d88d7a',
+            to: '7a96aaf6-7ed2-4c06-95e3-794c89d452e0',
+            msg_type: 'text',
+            message: data.message,
+        }
+
+        let ChatModel = await Chat();
+        await ChatModel.create(chatObj);
+
+        senderSocketID = online_users['6e351c95-82a5-4576-9d81-2392b1d88d7a']["socket_id"]
+        receiverSocketID = online_users['7a96aaf6-7ed2-4c06-95e3-794c89d452e0']["socket_id"]
+
+        io.to(receiverSocketID).to(senderSocketID).emit('trigger_message', { message: chatObj.message, type: chatObj.msg_type });
+        console.log("After Connection", online_users)
+    })
+
 
     socket.on('disconnect', async () => {
 

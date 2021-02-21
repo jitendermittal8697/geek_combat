@@ -1,18 +1,16 @@
-<% if (friend.name) { %>
+<% if (friend.name || 1) { %>
 <div class="chat-interface">
   <div class="chat-interface-head">
     <div class="user-profile">
-      <img src="<%= friend.friend_image %>" />
+      <img src="<%= friend.profile_image %>" />
     </div>
     <div class="friend-details">
-      <div class="name"><%= friend.name %></div>
+      <div class="name"><%= friend.username %></div>
       <div class="last-message"><%= friend.last_message %></div>
     </div>
   </div>
 
-  <div class="chat-interface-body msger-chat">
-
-    <% chats = [{
+    <%# chats = [{
         'name': 'Friend 1',
         'time': 'hh:mm',
         'message': 'Message 1',
@@ -118,13 +116,12 @@
         'image': '/images/male_avatar.png',
     }] %>
 
-    <% chats.forEach(function(chat){ %>
-        <%- include('chatMessage', {chat: chat}); %>
-    <% }); %>
+    <%# chats.forEach(function(chat){ %>
+        <%- include('chatBody', {friend:friend, chats: [chats]}); %>
+    <%# }); %>
 
-  </div>
   <form class="msger-inputarea">
-    <input type="text" class="msger-input" placeholder="Enter your message...">
+    <input type="text" class="msger-input" placeholder="Enter your message..." name="message">
     <button type="submit" class="msger-send-btn">Send</button>
   </form>
 </div>

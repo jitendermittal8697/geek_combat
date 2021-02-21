@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="/static/style.css" />
@@ -11,7 +11,7 @@
         include('../partials/friendList', {friends: friends}); %>
       </div>
       <div class="right-wrap">
-        <%- include('../partials/chatInterface', {friend: {}}); %>
+        <%- include('../partials/chatInterface', {friend: {friends}, chats: []}); %>
       </div>
     </div>
   </body>
@@ -43,7 +43,42 @@
       debounceRefreshFriendListTimeout = setTimeout(refreshFriendList, 3000);
     };
 
+    var debounceRefreshMessageTimeout = null;
+    var debounceRefreshMessage = function () {
+      var refreshMessageList = function (socket) {
+        $.ajax({
+          type: "POST",
+          url: "/refresh-message-list",
+          success: function (data1) {
+              console.log(data1)
+            $(".chat-interface-body").replaceWith(data1.html);
+          },
+          error: function (error) {
+            console.log(error);
+          },
+        });
+      };
+      clearTimeout(debounceRefreshMessageTimeout);
+      debounceRefreshMessageTimeout = setTimeout(refreshMessageList, 3000);
+    };
+
+    var sendMessage = function (socket) {
+        $.ajax({
+          type: "POST",
+          url: "/refresh-message-list",
+          success: function (data1) {
+              console.log(data1)
+            $(".chat-interface-body").replaceWith(data1.html);
+          },
+          error: function (error) {
+            console.log(error);
+          },
+        });
+      };
+
     socket.on("client_connected", debounceRefreshFriendList);
+    socket.on('client_connected', debounceRefreshMessage);
+    socket.on('trigger_message', sendMessage)
     socket.on("client_disconnected", debounceRefreshFriendList);
   </script>
   <script>
@@ -52,5 +87,12 @@
         $($(evt.target).parents("li.friend-list:first")).data("uuid")
       );
     });
+
+    $('.msger-send-btn').click(function (e) {
+      e.preventDefault()
+      socket.emit('send_message', {message: $('.msger-input').val()})
+      $('.msger-input').val('')
+    })
+
   </script>
-</html>
+  </html>
