@@ -42,15 +42,13 @@ const login = async (req, res) => {
             let uuid = userDetails[0]["uuid"]
             req.session.userDetails = userDetails[0];
 
-            io.on('connection', (socket) => {
+            io.sockets.on('connection', (socket) => {
                 online_users[uuid] = {
                     "name": userDetails[0]["username"],
                     'uuid': uuid,
                 }
-
-                console.log(uuid + ' connected');
                 io.emit('client_connected', { uuid: uuid });
-                socket.on('disconnect',async () => {
+                socket.on('disconnect', async () => {
                     delete online_users[uuid];
                     await UserModel.update({
                         last_login: new Date((new Date()).getTime() + 19800000),
@@ -60,7 +58,7 @@ const login = async (req, res) => {
 
                     socket.broadcast.emit('client_disconnected', { uuid: uuid });
 
-                    console.log(uuid + ' disconnected');
+                    socket.disconnect(true)
                 })
             });
 

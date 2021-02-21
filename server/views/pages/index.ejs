@@ -25,9 +25,8 @@
     var socket = io({ transports: ["websocket"], upgrade: false });
 
     var debounceRefreshFriendListTimeout = null;
-    var debounceRefreshFriendList = function () {
-
-      var refreshFriendList = function (socket) {
+    var debounceRefreshFriendList = function (socket_data) {
+      var refreshFriendList = function (socket_data) {
         $.ajax({
           type: "POST",
           url: "/refresh-friend-list",
@@ -46,5 +45,12 @@
 
     socket.on("client_connected", debounceRefreshFriendList);
     socket.on("client_disconnected", debounceRefreshFriendList);
+  </script>
+  <script>
+    $(document).on("click", "li.friend-list", function (evt) {
+      console.log(
+        $($(evt.target).parents("li.friend-list:first")).data("uuid")
+      );
+    });
   </script>
 </html>

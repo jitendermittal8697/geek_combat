@@ -7,15 +7,19 @@ const compileFriendListTemplate = async (req, res) => {
 
     let uuid = req.session.userDetails.uuid;
     if (uuid) {
-        let UserModel = await User();
+        // let UserModel = await User();
 
-        let userDetails = await UserModel.findAll({
-            where: {
-                uuid: Object.keys(online_users).filter(function(item) {
-                    return item !== uuid
-                })
-            }
-        });
+        // let userDetails = await UserModel.findAll({
+        //     where: {
+        //         uuid: Object.keys(online_users).filter(function(item) {
+        //             return item !== uuid
+        //         })
+        //     }
+        // });
+
+        let userDetails =  Object.values(online_users).filter(function (item) {
+            return item.uuid !== uuid
+        })
 
         try {
             let path = __dirname + "/../views/partials/friendList.ejs"
@@ -24,16 +28,16 @@ const compileFriendListTemplate = async (req, res) => {
                 filename: path
             })
             const html = friendListTemplate({ friends: userDetails })
-            res.send({html: html})
+            res.send({ html: html })
         }
         catch (error) {
             console.log(error)
-            res.status(500).send({error: error});
+            res.status(500).send({ error: error });
         }
     }
     else {
         console.log("Error Fetching Session Of The User")
-        res.status(500).send({html: "Error Fetching Session Of The User"})
+        res.status(500).send({ html: "Error Fetching Session Of The User" })
     }
 }
 

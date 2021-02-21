@@ -69,7 +69,7 @@ const UserModel = async () => {
         });
 
         // User.sync({ alter: true })
-        User.sync()
+        // User.sync()
 
         return User;
 
