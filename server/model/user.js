@@ -44,11 +44,11 @@ const UserModel = async () => {
                         this.setDataValue('friend_list', val)
                     }
                     else {
-                        if (this.getDataValue('friend_list').indexOf(val) == -1) {
-                            this.setDataValue('friend_list', val + ";" + this.getDataValue('friend_list'))
+                        if (val.split(',').join(';').indexOf(";") != -1) {
+                            this.setDataValue('friend_list', val.split(',').join(';'))
                         }
-                        else if (val.join(';').indexOf(";") != -1) {
-                            this.setDataValue('friend_list', val.join(';'))
+                        else if (this.getDataValue('friend_list').indexOf(val) == -1) {
+                            this.setDataValue('friend_list', val + ";" + this.getDataValue('friend_list'))
                         }
                     }
                 },

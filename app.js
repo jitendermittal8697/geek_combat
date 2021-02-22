@@ -76,8 +76,9 @@ io.on('connection', (socket) => {
                 where: { uuid: uuid }
             });
             console.log("????????", online_users[uuid]['friend_list']);
-            self.friend_list = online_users[uuid]['friend_list']
-            self.save()
+            self.friend_list = online_users[uuid]['friend_list'].join(';')
+            await self.save()
+            delete online_users[uuid]
         }
         catch (error) {
             console.log(error)
@@ -138,7 +139,6 @@ io.on('connection', (socket) => {
             message: msg,
         })
 
-
         if (online_users[senderUuid]["friend_list"].indexOf(receiverUuid) == -1) {
             addToFriendList({
                 senderUuid: senderUuid,
@@ -146,6 +146,7 @@ io.on('connection', (socket) => {
             })
         }
         online_users[senderUuid]["friend_list"] = [...new Set([receiverUuid, ...new Set(online_users[senderUuid]["friend_list"])])]
+        online_users[receiverUuid]["friend_list"] = [...new Set([senderUuid, ...new Set(online_users[receiverUuid]["friend_list"])])]
 
         io.to(receiverSocketID).emit('trigger_text_message', { name: senderName, message: msg, type: msgType });
         console.log("After Connection", online_users)
@@ -164,7 +165,6 @@ io.on('connection', (socket) => {
 
             updateLastLogin(disconnectedUuid)
             updateFriendListOrder(disconnectedUuid)
-            delete online_users[uuid]
             socket.broadcast.emit('disconnect_client', {});
             socket.disconnect(true)
             console.log("After Disconnection", online_users)
