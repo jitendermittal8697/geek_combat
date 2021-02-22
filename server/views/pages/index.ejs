@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
   <head>
     <link rel="stylesheet" href="/static/style.css" />
@@ -6,12 +6,13 @@
   <body>
     <div class="geek-combat chat-app">
       <div class="left-wrap">
-        <% friends = data.online_users %>
-        <%- include('../partials/header', {appData: appData, userDetails: data.userDetails}); %>
-        <%- include('../partials/friendList', {friends: friends}); %>
+        <% friends = data.online_users %> <%- include('../partials/header',
+        {appData: appData, userDetails: data.userDetails}); %> <%-
+        include('../partials/friendList', {friends: friends}); %>
       </div>
       <div class="right-wrap">
-        <%- include('../partials/chatInterface', {friend: {friends}, chats: []}); %>
+        <%- include('../partials/chatInterface', {friend: {friends}, chats:
+        []}); %>
       </div>
     </div>
   </body>
@@ -19,13 +20,62 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
   <script>
     var socket = io({ transports: ["websocket"], upgrade: false });
-    socket.emit("client_joined", { uuid: $(".user-profile").data("uuid") });
+    socket.emit("connecting", { uuid: $(".user-profile").data("uuid") });
+
+    function prepareTextMsgBubble(data) {
+      return (
+        `<div class="msg ` +
+        data.msg_class +
+        `">
+            <div class="msg-img" style="background-image: url('/images/male_avatar.png');"></div>
+            <div class="msg-bubble">
+                <div class="msg-info">
+                    <div class="msg-info-name"> ` +
+        data.username +
+        `</div>
+                    <div class="msg-info-time">` +
+        new Date().getHours() +
+        ":" +
+        new Date().getMinutes() +
+        `</div>
+                </div>
+                <div class="msg-text">` +
+        data.txt_msg +
+        `</div>
+            </div>
+        </div>`
+      );
+    }
+
+    function capitalizeText(text) {
+      return text.replace(/^\w/, (c) => c.toUpperCase());
+    }
+
+    function scrollChatBox() {
+      $(".msger-chat")
+        .stop()
+        .animate(
+          {
+            scrollTop: $(".msger-chat")[0].scrollHeight,
+          },
+          800
+        );
+    }
+
+    function appendTextMsgBubble(data) {
+      $(".msger-chat").append(prepareTextMsgBubble(data));
+    }
+
+    function clearTextArea() {
+      $(".msger-input").val("");
+    }
+
     var debounceRefreshFriendListTimeout = null;
-    var debounceRefreshFriendList = function (socket_data) {
+    var debounceRefreshClientCallback = function (socket_data) {
       var refreshFriendList = function (socket_data) {
         $.ajax({
           type: "POST",
-          url: "/refresh-friend-list",
+          url: "/compile/template/friend-list",
           success: function (data) {
             $(".left-wrap .friend-wrapper").replaceWith(data.html);
           },
@@ -38,11 +88,88 @@
       clearTimeout(debounceRefreshFriendListTimeout);
       debounceRefreshFriendListTimeout = setTimeout(refreshFriendList, 3000);
     };
+    socket.on("connect_client", debounceRefreshClientCallback);
+    socket.on("disconnect_client", debounceRefreshClientCallback); // Todo: online / offline flag
+
+    var appendTextMessageBubble = function (data) {
+      appendTextMsgBubble({
+        msg_class: "left-msg",
+        username: capitalizeText(data.name),
+        txt_msg: data.message,
+      });
+    };
+    socket.on("trigger_text_message", appendTextMessageBubble);
+
+    var sendMessage = function (data) {
+      $.ajax({
+        type: "POST",
+        url: "/compile/template/chat-interface",
+        headers: {
+          "content-type": "application/json",
+        },
+        data: JSON.stringify(data),
+        dataType: "json",
+        success: function (data) {
+          $(".right-wrap").html(data.html);
+          $(".msger-chat")
+            .stop()
+            .animate(
+              {
+                scrollTop: $(".msger-chat")[0].scrollHeight,
+              },
+              800
+            );
+        },
+        error: function (error) {
+          console.log(error);
+        },
+      });
+    };
+
+    // Event Listeners
+    $(document).on("click", "li.friend-list", function (evt) {
+      sendMessage({
+        data: {
+          friendDetails: {
+            uuid: $($(evt.target).parents("li.friend-list:first")).data("uuid"),
+          },
+          selfDetails: {
+            uuid: $(".user-profile").data("uuid"),
+          },
+        },
+      });
+    });
+
+    $(document).on("click", ".msger-send-btn", function (evt) {
+      evt.preventDefault();
+
+      appendTextMsgBubble({
+        msg_class: "right-msg",
+        username: "You",
+        txt_msg: $(".msger-input").val(),
+      });
+
+      socket.emit("send_text_message", {
+        friendDetails: {
+          uuid: $(".friend-details").data("uuid"),
+        },
+        selfDetails: {
+          uuid: $(".user-profile").data("uuid"),
+        },
+        msgDetails: {
+          messageType: "text",
+          message: $(".msger-input").val(),
+        },
+      });
+
+      clearTextArea();
+      scrollChatBox();
+    });
 
     var refreshMessageList = function () {
       $.ajax({
         type: "POST",
-        url: "/refresh-message-list",
+        url: "/compile/template/chat-body",
         headers: {
           "content-type": "application/json",
         },
@@ -54,9 +181,9 @@
             selfDetails: {
               uuid: $(".user-profile").data("uuid"),
             },
-          }
+          },
         }),
-        dataType: 'json',
+        dataType: "json",
         success: function (data1) {
           $(".chat-interface-body").replaceWith(data1.html);
         },
@@ -65,61 +192,5 @@
         },
       });
     };
-
-    var sendMessage = function (data) {
-        $.ajax({
-          type: "POST",
-          url: "/refresh-friend-chat",
-          headers: {
-            "content-type": "application/json",
-          },
-          data: JSON.stringify(data),
-          dataType: 'json',
-          success: function (data) {
-            $(".right-wrap").html(data.html);
-          },
-          error: function (error) {
-            console.log(error);
-          },
-        });
-      };
-
-    socket.on("client_connected", debounceRefreshFriendList);
-    socket.on('client_connected', refreshMessageList);
-    socket.on('trigger_message', refreshMessageList)
-    socket.on("client_disconnected", debounceRefreshFriendList);
-
-    $(document).on("click", "li.friend-list", function (evt) {
-      sendMessage({
-        data: {
-          friendDetails: {
-            uuid: $($(evt.target).parents("li.friend-list:first")).data("uuid"),
-          },
-          selfDetails: {
-            uuid: $(".user-profile").data("uuid"),
-          }
-        }
-      })
-    });
-
-    $(document).on("click", ".msger-send-btn", function (evt) {
-      evt.preventDefault()
-      socket.emit('send_message', {
-        data: {
-          friendDetails: {
-            uuid: $(".friend-details").data("uuid"),
-          },
-          selfDetails: {
-            uuid: $(".user-profile").data("uuid"),
-          },
-          msgDetails: {
-            messageType: "text",
-            message: $('.msger-input').val(),
-          }
-        }
-      })
-      $('.msger-input').val('')
-    })
-
   </script>
 </html>

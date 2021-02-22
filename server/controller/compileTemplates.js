@@ -4,48 +4,67 @@ const { User } = require('../model/user')
 const { Chat } = require('../model/chat')
 const { online_users } = require('../utils/onlineUser')
 
+async function compileTemplate(data) {
+    try {
+        let path = data.path;
+        const file = await readFile(path, 'utf-8')
+        const fileTemplate = ejs.compile(file, {
+            filename: path
+        })
+        const html = fileTemplate(data.templateData)
+        return {
+            response: true,
+            data: html,
+        }
+    }
+    catch (error) {
+        console.log(error)
+        return {
+            response: false,
+            error: error,
+        }
+    }
+}
+
+
 const compileFriendListTemplate = async (req, res) => {
 
     let uuid = req.session.userDetails.uuid;
     if (uuid) {
-        let userDetails =  Object.values(online_users).filter(function (item) {
+        let userDetails = Object.values(online_users).filter(function (item) {
             return item.uuid !== uuid
         })
 
-        try {
-            let path = __dirname + "/../views/partials/friendList.ejs"
-            const friendListFile = await readFile(path, 'utf-8')
-            const friendListTemplate = ejs.compile(friendListFile, {
-                filename: path
-            })
-            const html = friendListTemplate({ friends: userDetails })
-            res.send({ html: html })
+        const result = compileTemplate({
+            path: __dirname + "/../views/partials/friendList.ejs",
+            templateData: { friends: userDetails },
+        })
+        if (result.response) {
+            res.send({ html: result.data })
         }
-        catch (error) {
-            console.log(error)
-            res.status(500).send({ error: error });
-        }
+        res.status(500).send({ html: result.error })
+
     }
     else {
-        console.log("Error Fetching Session Of The User")
-        res.status(500).send({ html: "Error Fetching Session Of The User" })
+        res.status(401).send({ html: "SESSION ID MISSING" })
     }
 }
 
-const compileSingleChatTemplate = async (req, res) => {
+const compilePrivateChatBodyTemplate = async (req, res) => {
     let selfUuid = req.session.userDetails.uuid;
-    let data = req.body.data;
     if (selfUuid) {
+        let data = req.body.data;
         let ChatModel = await Chat();
         let UserModel = await User();
 
         let friendDetails = await UserModel.findAll({
             where: {
-                uuid: Object.keys(online_users).filter(function(item) {
+                uuid: Object.keys(online_users).filter(function (item) {
                     return item !== selfUuid
                 })
             }
         });
+
         let chatDetails = await ChatModel.findAll({
             where: {
                 to: [data.selfDetails.uuid, data.friendDetails.uuid],
@@ -56,32 +75,25 @@ const compileSingleChatTemplate = async (req, res) => {
             ],
         });
 
-        try {
-            let path = __dirname + "/../views/partials/chatBody.ejs"
-            const chatInterfaceFile = await readFile(path, 'utf-8')
-            const chatInterfaceTemplate = ejs.compile(chatInterfaceFile, {
-                filename: path
-            })
-            const html = chatInterfaceTemplate({ friend:friendDetails[0], chats: chatDetails })
-            res.send({html: html})
+        const result = compileTemplate({
+            path: __dirname + "/../views/partials/chatBody.ejs",
+            templateData: { friend: friendDetails[0], chats: chatDetails },
+        })
+        if (result.response) {
+            res.send({ html: result.data })
         }
-        catch (error) {
-            console.log(error)
-            res.status(500).send({error: error});
-        }
+        res.status(500).send({ html: result.error })
+
     }
     else {
-        console.log("Error Fetching Chats Of The Users")
-        res.status(500).send({html: "Error Fetching Chats Of The User"})
+        res.status(401).send({ html: "SESSION ID MISSING" })
     }
 }
 
-const compileFriendChatTemplate = async (req, res) => {
+const compileChatInterfaceTemplate = async (req, res) => {
     let selfUuid = req.session.userDetails.uuid;
-
-    let data = req.body.data;
-
     if (selfUuid) {
+        let data = req.body.data;
         let ChatModel = await Chat();
         let UserModel = await User();
 
@@ -90,7 +102,7 @@ const compileFriendChatTemplate = async (req, res) => {
                 uuid: data.friendDetails.uuid
             }
         });
-        console.log(friendDetails);
+
         let chatDetails = await ChatModel.findAll({
             where: {
                 to: [data.selfDetails.uuid, data.friendDetails.uuid],
@@ -101,29 +113,23 @@ const compileFriendChatTemplate = async (req, res) => {
             ],
         });
 
-        console.log(chatDetails);
-        try {
-            let path = __dirname + "/../views/partials/chatInterface.ejs"
-            const chatInterfaceFile = await readFile(path, 'utf-8')
-            const chatInterfaceTemplate = ejs.compile(chatInterfaceFile, {
-                filename: path
-            })
-            const html = chatInterfaceTemplate({ friend:friendDetails[0], chats: chatDetails })
-            res.send({html: html})
+        const result = compileTemplate({
+            path: __dirname + "/../views/partials/chatInterface.ejs",
+            templateData: { friend: friendDetails[0], chats: chatDetails },
+        })
+        if (result.response) {
+            res.send({ html: result.data })
         }
-        catch (error) {
-            console.log(error)
-            res.status(500).send({error: error});
-        }
+        res.status(500).send({ html: result.error })
+
     }
     else {
-        console.log("Error Fetching Chats Of The Users")
-        res.status(500).send({html: "Error Fetching Chats Of The User"})
+        res.status(401).send({ html: "SESSION ID MISSING" })
     }
 }
 
 module.exports = {
     compileFriendListTemplate,
-    compileSingleChatTemplate,
-    compileFriendChatTemplate
+    compilePrivateChatBodyTemplate,
+    compileChatInterfaceTemplate
 }

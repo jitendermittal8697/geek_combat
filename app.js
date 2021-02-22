@@ -10,7 +10,7 @@ const path = require('path');
 
 const { signup, login } = require('./server/controller/user');
 const { redirectUserCallback, checkSession } = require('./server/middleware/restrictAccess')
-const { compileFriendListTemplate, compileSingleChatTemplate, compileFriendChatTemplate } = require('./server/controller/compileTemplates')
+const { compileFriendListTemplate, compilePrivateChatBodyTemplate, compileChatInterfaceTemplate } = require('./server/controller/compileTemplates')
 
 const { io } = require('./server/utils/socket')
 const { online_users } = require('./server/utils/onlineUser')
@@ -48,14 +48,28 @@ app.get('/chats', function (req, res) {
     res.render('pages/index', { appData: { name: process.env.APP_NAME }, data: req.session });
 })
 
-app.post('/refresh-friend-list', compileFriendListTemplate)
-app.post('/refresh-message-list', compileSingleChatTemplate)
-app.post('/refresh-friend-chat', compileFriendChatTemplate)
+app.post('/compile/template/friend-list', compileFriendListTemplate)
+app.post('/compile/template/chat-body', compilePrivateChatBodyTemplate)
+app.post('/compile/template/chat-interface', compileChatInterfaceTemplate)
 
 // app.all('*', redirectUserCallback)
 io.on('connection', (socket) => {
 
-    socket.on('client_joined', async (data) => {
+    async function insertTextChat(chatObj) {
+        let ChatModel = await Chat();
+        await ChatModel.create(chatObj);
+    }
+
+    async function updateLastLogin(uuid) {
+        let UserModel = await User();
+        await UserModel.update({
+            last_login: new Date((new Date()).getTime() + 19800000),
+        }, {
+            where: { uuid: uuid }
+        });
+    }
+
+    socket.on('connecting', async (data) => {
 
         let userid = data.uuid;
         let UserModel = await User();
@@ -70,31 +84,28 @@ io.on('connection', (socket) => {
             "profile_image": userDetails[0].profile_image,
         }
 
-        io.emit('client_connected', {});
+        io.emit('connect_client', {});
         console.log("After Connection", online_users)
     })
 
 
-    socket.on('send_message', async (data) => {
+    socket.on('send_text_message', async (data) => {
 
-        console.log(data)
-        let senderUuid = data.data.selfDetails.uuid;
-        let receiverUuid = data.data.friendDetails.uuid;
+        let senderUuid = data.selfDetails.uuid;
+        let receiverUuid = data.friendDetails.uuid;
+        let receiverSocketID = online_users[receiverUuid]["socket_id"];
+        let senderName = online_users[senderUuid]['username'];
+        let msgType = data.msgDetails.messageType;
+        let msg = data.msgDetails.message;
 
-        const chatObj = {
+        insertTextChat({
             from: senderUuid,
             to: receiverUuid,
-            msg_type: data.data.msgDetails.messageType,
-            message: data.data.msgDetails.message,
-        }
+            msg_type: msgType,
+            message: msg,
+        })
 
-        let ChatModel = await Chat();
-        await ChatModel.create(chatObj);
-
-        senderSocketID = online_users[senderUuid]["socket_id"]
-        receiverSocketID = online_users[receiverUuid]["socket_id"]
-
-        io.to(receiverSocketID).to(senderSocketID).emit('trigger_message', { message: chatObj.message, type: chatObj.msg_type });
+        io.to(receiverSocketID).emit('trigger_text_message', { name: senderName, message: msg, type: msgType });
         console.log("After Connection", online_users)
     })
 
@@ -110,14 +121,8 @@ io.on('connection', (socket) => {
                 }
             }
 
-            let UserModel = await User();
-            await UserModel.update({
-                last_login: new Date((new Date()).getTime() + 19800000),
-            }, {
-                where: { uuid: disconnectedUuid }
-            });
-
-            socket.broadcast.emit('client_disconnected', {});
+            updateLastLogin(disconnectedUuid)
+            socket.broadcast.emit('disconnect_client', {});
             socket.disconnect(true)
             console.log("After Disconnection", online_users)
         }
