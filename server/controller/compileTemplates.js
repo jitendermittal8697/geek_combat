@@ -39,10 +39,14 @@ const compileFriendListTemplate = async (req, res) => {
             path: __dirname + "/../views/partials/friendList.ejs",
             templateData: { friends: userDetails },
         })
-        if (result.response) {
-            res.send({ html: result.data })
-        }
-        res.status(500).send({ html: result.error })
+
+        result.then(function (data) {
+            if (!data.response) res.status(500).send({ html: data.error })
+            res.send({ html: data.data })
+        }).catch(function (error) {
+            res.status(500).send({ html: error })
+        })
+
 
     }
     else {
@@ -79,10 +83,13 @@ const compilePrivateChatBodyTemplate = async (req, res) => {
             path: __dirname + "/../views/partials/chatBody.ejs",
             templateData: { friend: friendDetails[0], chats: chatDetails },
         })
-        if (result.response) {
-            res.send({ html: result.data })
-        }
-        res.status(500).send({ html: result.error })
+
+        result.then(function (data) {
+            if (!data.response) res.status(500).send({ html: data.error })
+            res.send({ html: data.data })
+        }).catch(function (error) {
+            res.status(500).send({ html: error })
+        })
 
     }
     else {
@@ -117,10 +124,13 @@ const compileChatInterfaceTemplate = async (req, res) => {
             path: __dirname + "/../views/partials/chatInterface.ejs",
             templateData: { friend: friendDetails[0], chats: chatDetails },
         })
-        if (result.response) {
-            res.send({ html: result.data })
-        }
-        res.status(500).send({ html: result.error })
+
+        result.then(function (data) {
+            if (!data.response) res.status(500).send({ html: data.error })
+            res.send({ html: data.data })
+        }).catch(function (error) {
+            res.status(500).send({ html: error })
+        })
 
     }
     else {
