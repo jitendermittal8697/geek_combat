@@ -1,130 +1,21 @@
-<% if (friend.name || 1) { %>
-<div class="chat-interface">
-  <div class="chat-interface-head">
-    <div class="user-profile">
-      <img src="<%= friend.profile_image %>" />
+<% if (friend.username) { %>
+    <div class="chat-interface">
+    <div class="chat-interface-head">
+        <div class="user-profile">
+            <img src="<%= friend.profile_image %>" />
+        </div>
+        <div class="friend-details" data-uuid="<%= friend.uuid %>">
+            <div class="name"><%= friend.username %></div>
+            <div class="last-message"><%= friend.last_message %></div>
+        </div>
     </div>
-    <div class="friend-details">
-      <div class="name"><%= friend.username %></div>
-      <div class="last-message"><%= friend.last_message %></div>
+
+    <%- include('chatBody', {friend:friend, chats: chats}); %>
     </div>
-  </div>
-
-    <%# chats = [{
-        'name': 'Friend 1',
-        'time': 'hh:mm',
-        'message': 'Message 1',
-        'position': 'right-msg',
-        'image': '/images/male_avatar.png',
-    },
-    {
-        'name': 'Friend 2',
-        'time': 'hh:mm',
-        'message': 'Message 2',
-        'position': 'left-msg',
-        'image': '/images/female_avatar.png',
-    },
-    {
-        'name': 'Friend 1',
-        'time': 'hh:mm',
-        'message': 'Message 1',
-        'position': 'right-msg',
-        'image': '/images/male_avatar.png',
-    },
-    {
-        'name': 'Friend 1',
-        'time': 'hh:mm',
-        'message': 'Message 1',
-        'position': 'right-msg',
-        'image': '/images/male_avatar.png',
-    },
-    {
-        'name': 'Friend 2',
-        'time': 'hh:mm',
-        'message': 'Message 2',
-        'position': 'left-msg',
-        'image': '/images/female_avatar.png',
-    },
-    {
-        'name': 'Friend 1',
-        'time': 'hh:mm',
-        'message': 'Message 1',
-        'position': 'right-msg',
-        'image': '/images/male_avatar.png',
-    },
-    {
-        'name': 'Friend 1',
-        'time': 'hh:mm',
-        'message': 'Message 1',
-        'position': 'right-msg',
-        'image': '/images/male_avatar.png',
-    },
-    {
-        'name': 'Friend 2',
-        'time': 'hh:mm',
-        'message': 'Message 2',
-        'position': 'left-msg',
-        'image': '/images/female_avatar.png',
-    },
-    {
-        'name': 'Friend 1',
-        'time': 'hh:mm',
-        'message': 'Message 1',
-        'position': 'right-msg',
-        'image': '/images/male_avatar.png',
-    },
-    {
-        'name': 'Friend 1',
-        'time': 'hh:mm',
-        'message': 'Message 1',
-        'position': 'right-msg',
-        'image': '/images/male_avatar.png',
-    },
-    {
-        'name': 'Friend 2',
-        'time': 'hh:mm',
-        'message': 'Message 2',
-        'position': 'left-msg',
-        'image': '/images/female_avatar.png',
-    },
-    {
-        'name': 'Friend 1',
-        'time': 'hh:mm',
-        'message': 'Message 1',
-        'position': 'right-msg',
-        'image': '/images/male_avatar.png',
-    },
-    {
-        'name': 'Friend 1',
-        'time': 'hh:mm',
-        'message': 'Message 1',
-        'position': 'right-msg',
-        'image': '/images/male_avatar.png',
-    },
-    {
-        'name': 'Friend 2',
-        'time': 'hh:mm',
-        'message': 'Message 2',
-        'position': 'left-msg',
-        'image': '/images/female_avatar.png',
-    },
-    {
-        'name': 'Friend 1',
-        'time': 'hh:mm',
-        'message': 'Message 1',
-        'position': 'right-msg',
-        'image': '/images/male_avatar.png',
-    }] %>
-
-    <%# chats.forEach(function(chat){ %>
-        <%- include('chatBody', {friend:friend, chats: [chats]}); %>
-    <%# }); %>
-
-  <form class="msger-inputarea">
-    <input type="text" class="msger-input" placeholder="Enter your message..." name="message">
-    <button type="submit" class="msger-send-btn">Send</button>
-  </form>
-</div>
+    <form class="msger-inputarea">
+        <input type="text" class="msger-input" placeholder="Enter your message..." name="message">
+        <button type="submit" class="msger-send-btn">Send</button>
+    </form>
 <% } else { %>
 
 <% } %>

@@ -1,22 +1,21 @@
 <div class="chat-interface-body msger-chat">
-
-    <% chats.forEach(function(chat){ %>
-    <% if (chat.from == friend.uuid) { %>
-    <% final_position = 'left-msg' %>
-    <% sender_name = friend.username %>
-    <% } else { %>
-    <% final_position = 'right-msg' %>
-    <% sender_name = '' %>
-    <% } %>
-    <div class="msg <%= final_position %>">
-        <div class="msg-img" style="background-image: url('<%= friend.profile_image %>');"></div>
-        <div class="msg-bubble">
-            <div class="msg-info">
-                <div class="msg-info-name"><%= sender_name %></div>
-                <div class="msg-info-time"><%= chat.createdAt %></div>
+    <% chats.forEach(function(chat) { %>
+        <% if (chat.from == friend.uuid) { %>
+            <% final_position = 'left-msg' %>
+            <% sender_name = friend.username %>
+        <% } else { %>
+            <% final_position = 'right-msg' %>
+            <% sender_name = '' %>
+        <% } %>
+        <div class="msg <%= final_position %>">
+            <div class="msg-img" style="background-image: url('<%= friend.profile_image %>');"></div>
+            <div class="msg-bubble">
+                <div class="msg-info">
+                    <div class="msg-info-name"><%= sender_name %></div>
+                    <div class="msg-info-time"><%= chat.createdAt %></div>
+                </div>
+                <div class="msg-text"><%= chat.message %></div>
             </div>
-            <div class="msg-text"><%= chat.message %></div>
         </div>
-    </div>
     <% }); %>
 </div>

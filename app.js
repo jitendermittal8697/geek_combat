@@ -10,8 +10,7 @@ const path = require('path');
 
 const { signup, login } = require('./server/controller/user');
 const { redirectUserCallback, checkSession } = require('./server/middleware/restrictAccess')
-const { compileFriendListTemplate, compileSingleChatTemplate } = require('./server/controller/compileTemplates')
-const { sendMessage, receiveMessage } = require('./server/controller/chat');
+const { compileFriendListTemplate, compileSingleChatTemplate, compileFriendChatTemplate } = require('./server/controller/compileTemplates')
 
 const { io } = require('./server/utils/socket')
 const { online_users } = require('./server/utils/onlineUser')
@@ -51,6 +50,7 @@ app.get('/chats', function (req, res) {
 
 app.post('/refresh-friend-list', compileFriendListTemplate)
 app.post('/refresh-message-list', compileSingleChatTemplate)
+app.post('/refresh-friend-chat', compileFriendChatTemplate)
 
 // app.all('*', redirectUserCallback)
 io.on('connection', (socket) => {
@@ -62,7 +62,7 @@ io.on('connection', (socket) => {
         let userDetails = await UserModel.findAll({
             where: { uuid: userid }
         });
-        // console.log(userDetails)
+
         online_users[userid] = {
             "uuid": userid,
             "socket_id": socket.id,
@@ -77,18 +77,22 @@ io.on('connection', (socket) => {
 
     socket.on('send_message', async (data) => {
 
+        console.log(data)
+        let senderUuid = data.data.selfDetails.uuid;
+        let receiverUuid = data.data.friendDetails.uuid;
+
         const chatObj = {
-            from: '6e351c95-82a5-4576-9d81-2392b1d88d7a',
-            to: '7a96aaf6-7ed2-4c06-95e3-794c89d452e0',
-            msg_type: 'text',
-            message: data.message,
+            from: senderUuid,
+            to: receiverUuid,
+            msg_type: data.data.msgDetails.messageType,
+            message: data.data.msgDetails.message,
         }
 
         let ChatModel = await Chat();
         await ChatModel.create(chatObj);
 
-        senderSocketID = online_users['6e351c95-82a5-4576-9d81-2392b1d88d7a']["socket_id"]
-        receiverSocketID = online_users['7a96aaf6-7ed2-4c06-95e3-794c89d452e0']["socket_id"]
+        senderSocketID = online_users[senderUuid]["socket_id"]
+        receiverSocketID = online_users[receiverUuid]["socket_id"]
 
         io.to(receiverSocketID).to(senderSocketID).emit('trigger_message', { message: chatObj.message, type: chatObj.msg_type });
         console.log("After Connection", online_users)
