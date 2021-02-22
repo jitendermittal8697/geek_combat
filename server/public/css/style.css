@@ -64,6 +64,10 @@
   font-size: 20px;
 }
 
+.chat-header .left-head p {
+  text-transform: capitalize;
+}
+
 .user-profile img {
   height: 50px;
   border-radius: 50%;
@@ -117,12 +121,15 @@
   font-size: 22px;
 }
 
+.friend-chat-head .name, .chat-interface-head .friend-details .name {
+  text-transform: capitalize;
+}
 .msger-chat {
   flex: 1;
   overflow: scroll;
   overflow-x: hidden;
   padding: 10px;
-  max-height: calc(100vh - 160px);
+  height: calc(100vh - 160px);
 }
 
 .msg {
@@ -166,7 +173,7 @@
 
 .left-msg .msg-bubble {
   border-bottom-left-radius: 0;
-  background:#ececec;
+  background: #ececec;
 }
 
 .right-msg {

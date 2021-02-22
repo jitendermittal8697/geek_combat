@@ -3,6 +3,7 @@ const ejs = require('ejs');
 const { User } = require('../model/user')
 const { Chat } = require('../model/chat')
 const { online_users } = require('../utils/onlineUser')
+const { Sequelize } = require('sequelize');
 
 async function compileTemplate(data) {
     try {
@@ -31,8 +32,32 @@ const compileFriendListTemplate = async (req, res) => {
 
     let uuid = req.session.userDetails.uuid;
     if (uuid) {
-        let userDetails = Object.values(online_users).filter(function (item) {
-            return item.uuid !== uuid
+        // let userDetails = Object.values(online_users).filter(function (item) {
+        //     return item.uuid !== uuid
+        // })
+
+        // const tempSQL = sequelize.dialect.queryGenerator.selectQuery('MyOtherTable',{
+        //     attributes: ['fkey'],
+        //     where: {
+        //           field1: 1,
+        //           field2: 2,
+        //           field3: 3
+        //     }})
+        //     .slice(0,-1); // to remove the ';' from the end of the SQL
+
+        // MyTable.find( {
+        //     where: {
+        //         id: {
+        //               [Sequelize.Op.notIn]: sequelize.literal(`(${tempSQL})`)
+        //         }
+        //     }
+        // } );
+
+        let UserModel = await User();
+        let userDetails = await UserModel.findAll({
+            where: {
+                uuid: { [Sequelize.Op.not]: uuid}
+            }
         })
 
         const result = compileTemplate({

@@ -32,21 +32,34 @@ const UserModel = async () => {
                 allowNull: false
             },
             friend_list: {
-                type: Sequelize.STRING,
+                type: Sequelize.STRING(5000),
                 get() {
-                    return this.getDataValue('friend_list') != null ? this.getDataValue('friend_list').split(';') : "";
+                    if (this.getDataValue('friend_list') != null) {
+                        return this.getDataValue('friend_list').split(';')
+                    }
+                    return "";
                 },
                 set(val) {
-                    this.setDataValue('friend_list', val.join(';'));
+                    if (this.getDataValue('friend_list') == null) {
+                        this.setDataValue('friend_list', val)
+                    }
+                    else {
+                        if (this.getDataValue('friend_list').indexOf(val) == -1) {
+                            this.setDataValue('friend_list', val + ";" + this.getDataValue('friend_list'))
+                        }
+                        else if (val.join(';').indexOf(";") != -1) {
+                            this.setDataValue('friend_list', val.join(';'))
+                        }
+                    }
                 },
             },
             group_list: {
-                type: Sequelize.STRING,
+                type: Sequelize.STRING(5000),
                 get() {
                     return this.getDataValue('group_list') != null ? this.getDataValue('group_list').split(';') : "";
                 },
                 set(val) {
-                    this.setDataValue('group_list', val.join(';'));
+                    this.setDataValue('group_list', this.getDataValue('group_list') == null ? val : this.getDataValue('group_list') + ';' + val);
                 },
             },
             is_active: {
@@ -68,7 +81,7 @@ const UserModel = async () => {
             timezone: 'Asia/Calcutta', dialectOptions: { timezone: 'Asia/Calcutta', },
         });
 
-        // User.sync({ alter: true })
+        User.sync({ alter: true })
         // User.sync()
 
         return User;

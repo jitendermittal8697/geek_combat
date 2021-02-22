@@ -34,9 +34,9 @@
         data.username +
         `</div>
                     <div class="msg-info-time">` +
-        new Date().getHours() +
+        new Date().getHours().toString().padStart(2, "0") +
         ":" +
-        new Date().getMinutes() +
+        new Date().getMinutes().toString().padStart(2, "0") +
         `</div>
                 </div>
                 <div class="msg-text">` +
@@ -101,29 +101,24 @@
     socket.on("trigger_text_message", appendTextMessageBubble);
 
     var sendMessage = function (data) {
-      $.ajax({
-        type: "POST",
-        url: "/compile/template/chat-interface",
-        headers: {
-          "content-type": "application/json",
-        },
-        data: JSON.stringify(data),
-        dataType: "json",
-        success: function (data) {
-          $(".right-wrap").html(data.html);
-          $(".msger-chat")
-            .stop()
-            .animate(
-              {
-                scrollTop: $(".msger-chat")[0].scrollHeight,
-              },
-              800
-            );
-        },
-        error: function (error) {
-          console.log(error);
-        },
-      });
+      if (data.data.friendDetails.uuid != $(".friend-details").data("uuid")) {
+        $.ajax({
+          type: "POST",
+          url: "/compile/template/chat-interface",
+          headers: {
+            "content-type": "application/json",
+          },
+          data: JSON.stringify(data),
+          dataType: "json",
+          success: function (result) {
+            $(".right-wrap").html(result.html);
+            scrollChatBox();
+          },
+          error: function (error) {
+            console.log(error);
+          },
+        });
+      }
     };
 
     // Event Listeners

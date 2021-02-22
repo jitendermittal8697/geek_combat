@@ -69,6 +69,38 @@ io.on('connection', (socket) => {
         });
     }
 
+    async function updateFriendListOrder(uuid) {
+        try {
+            let UserModel = await User();
+            let self = await UserModel.findOne({
+                where: { uuid: uuid }
+            });
+            console.log("????????", online_users[uuid]['friend_list']);
+            self.friend_list = online_users[uuid]['friend_list']
+            self.save()
+        }
+        catch (error) {
+            console.log(error)
+        }
+    }
+
+    async function addToFriendList(data) {
+        try {
+            let UserModel = await User();
+
+            let record = await UserModel.findOne({ where: { uuid: data.senderUuid } });
+            record.friend_list = data.receiverUuid;
+            await record.save();
+
+            record = await UserModel.findOne({ where: { uuid: data.receiverUuid } });
+            record.friend_list = data.senderUuid;
+            await record.save();
+        }
+        catch (error) {
+            console.log(error);
+        }
+    }
+
     socket.on('connecting', async (data) => {
 
         let userid = data.uuid;
@@ -82,6 +114,7 @@ io.on('connection', (socket) => {
             "socket_id": socket.id,
             "username": userDetails[0].username,
             "profile_image": userDetails[0].profile_image,
+            "friend_list": userDetails[0].friend_list,
         }
 
         io.emit('connect_client', {});
@@ -105,6 +138,15 @@ io.on('connection', (socket) => {
             message: msg,
         })
 
+
+        if (online_users[senderUuid]["friend_list"].indexOf(receiverUuid) == -1) {
+            addToFriendList({
+                senderUuid: senderUuid,
+                receiverUuid: receiverUuid,
+            })
+        }
+        online_users[senderUuid]["friend_list"] = [...new Set([receiverUuid, ...new Set(online_users[senderUuid]["friend_list"])])]
+
         io.to(receiverSocketID).emit('trigger_text_message', { name: senderName, message: msg, type: msgType });
         console.log("After Connection", online_users)
     })
@@ -117,11 +159,12 @@ io.on('connection', (socket) => {
             for (const uuid in online_users) {
                 if (socket.id == online_users[uuid]["socket_id"]) {
                     disconnectedUuid = online_users[uuid]["uuid"];
-                    delete online_users[uuid]
                 }
             }
 
             updateLastLogin(disconnectedUuid)
+            updateFriendListOrder(disconnectedUuid)
+            delete online_users[uuid]
             socket.broadcast.emit('disconnect_client', {});
             socket.disconnect(true)
             console.log("After Disconnection", online_users)
