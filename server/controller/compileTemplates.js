@@ -4,6 +4,7 @@ const { User } = require('../model/user')
 const { Chat } = require('../model/chat')
 const { online_users } = require('../utils/onlineUser')
 const { Sequelize } = require('sequelize');
+var { dbconn } = require('../utils/dbconn')
 
 async function compileTemplate(data) {
     try {
@@ -27,42 +28,62 @@ async function compileTemplate(data) {
     }
 }
 
-
 const compileFriendListTemplate = async (req, res) => {
 
     let uuid = req.session.userDetails.uuid;
     if (uuid) {
-        // let userDetails = Object.values(online_users).filter(function (item) {
-        //     return item.uuid !== uuid
-        // })
 
-        // const tempSQL = sequelize.dialect.queryGenerator.selectQuery('MyOtherTable',{
-        //     attributes: ['fkey'],
-        //     where: {
-        //           field1: 1,
-        //           field2: 2,
-        //           field3: 3
-        //     }})
-        //     .slice(0,-1); // to remove the ';' from the end of the SQL
+        // const sequelize = await dbconn()
+        let UserModel = await User();
 
-        // MyTable.find( {
+        // const tempSQL = sequelize.dialect.queryGenerator.selectQuery('users', {
+        //     attributes: ['friend_list'],
         //     where: {
-        //         id: {
-        //               [Sequelize.Op.notIn]: sequelize.literal(`(${tempSQL})`)
+        //         uuid: uuid
+        //     }
+        // }).slice(0, -1);
+
+        // console.log(tempSQL);
+
+        // let friends = await UserModel.findAll({
+        //     where: {
+        //         uuid: {
+        //             [Sequelize.Op.in]: Sequelize.literal(`(${tempSQL})`)
         //         }
         //     }
-        // } );
+        // });
 
-        let UserModel = await User();
-        let userDetails = await UserModel.findAll({
+        // let newUsers = await UserModel.findAll({
+        //     where: {
+        //         uuid: {
+        //             [Sequelize.Op.notIn]: Sequelize.literal(`(${tempSQL})`)
+        //         }
+        //     }
+        // });
+
+        // console.log(friends, newUsers)
+        // let userDetails = [...friends, ...newUsers];
+        let othersDetails = await UserModel.findAll({
             where: {
-                uuid: { [Sequelize.Op.not]: uuid}
+                uuid: { [Sequelize.Op.not]: uuid }
             }
         })
 
+        let selfDetails = await UserModel.findAll({
+            where: {
+                uuid: uuid
+            }
+        });
+
+        var friendListArray = selfDetails[0].friend_list
+
+        let sortedUserDetails = othersDetails.sort(function (a, b) {
+            return friendListArray.indexOf(a.uuid) - friendListArray.indexOf(b.uuid);
+        });
+
         const result = compileTemplate({
             path: __dirname + "/../views/partials/friendList.ejs",
-            templateData: { friends: userDetails },
+            templateData: { friends: sortedUserDetails },
         })
 
         result.then(function (data) {
