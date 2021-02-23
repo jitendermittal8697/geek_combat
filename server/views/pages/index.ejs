@@ -86,7 +86,7 @@
       };
 
       clearTimeout(debounceRefreshFriendListTimeout);
-      debounceRefreshFriendListTimeout = setTimeout(refreshFriendList, 3000);
+      debounceRefreshFriendListTimeout = setTimeout(refreshFriendList, 0);
     };
     socket.on("connect_client", debounceRefreshClientCallback);
     socket.on("disconnect_client", debounceRefreshClientCallback); // Todo: online / offline flag

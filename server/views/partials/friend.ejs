@@ -8,12 +8,12 @@
                 <%= friend.username %>
             </div>
             <div class="last-message">
-                <%= friend.last_message %>
+                <%= friend.chat.message %>
             </div>
         </div>
         <div class="other-details">
             <div class="last-message-date">
-                <%= friend.last_message_date %>
+                <%= new Date(friend.chat.createdAt).getHours().toString().padStart(2, "0") %>:<%= new Date(friend.chat.createdAt).getMinutes().toString().padStart(2, "0"); %>
             </div>
         </div>
     </div>

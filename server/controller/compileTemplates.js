@@ -3,7 +3,7 @@ const ejs = require('ejs');
 const { User } = require('../model/user')
 const { Chat } = require('../model/chat')
 const { online_users } = require('../utils/onlineUser')
-const { Sequelize } = require('sequelize');
+const { Sequelize, QueryTypes } = require('sequelize');
 var { dbconn } = require('../utils/dbconn')
 
 async function compileTemplate(data) {
@@ -34,6 +34,7 @@ const compileFriendListTemplate = async (req, res) => {
     if (uuid) {
 
         let UserModel = await User();
+        const sequelize = await dbconn()
 
         let othersDetails = await UserModel.findAll({
             where: {
@@ -47,11 +48,110 @@ const compileFriendListTemplate = async (req, res) => {
             }
         });
 
+        let latestChats = `SELECT
+            \`to\`,
+            \`from\`,
+            \`msg_type\`,
+            \`message\`,
+            \`createdAt\`
+        FROM
+            chat
+        where
+            createdAt IN (
+            select
+                DISTINCT(GREATEST(t1.createdAt, t2.createdAt))
+            FROM
+                (
+                SELECT
+                    m.to,
+                    m.from,
+                    \`msg_type\`,
+                    \`message\`,
+                    \`createdAt\`
+                FROM
+                    chat AS m
+                    INNER JOIN (
+                    SELECT
+                        \`to\`,
+                        \`from\`,
+                        MAX(STR_TO_DATE(\`createdAt\`, '%Y-%m-%d %H:%i:%s')) AS maxDate
+                    FROM
+                        chat
+                    GROUP BY
+                        \`to\`,
+                        \`from\`
+                    ORDER BY
+                        maxDate DESC
+                    ) AS l ON l.to = m.to
+                    AND l.from = m.from
+                    AND l.maxDate = STR_TO_DATE(m.\`createdAt\`, '%Y-%m-%d %H:%i:%s')
+                WHERE
+                    m.to = '${uuid}'
+                    OR m.from = '${uuid}'
+                ) t1
+                INNER JOIN (
+                SELECT
+                    m.to,
+                    m.from,
+                    \`msg_type\`,
+                    \`message\`,
+                    \`createdAt\`
+                FROM
+                    chat AS m
+                    INNER JOIN (
+                    SELECT
+                        \`to\`,
+                        \`from\`,
+                        MAX(STR_TO_DATE(\`createdAt\`, '%Y-%m-%d %H:%i:%s')) AS maxDate
+                    FROM
+                        chat
+                    GROUP BY
+                        \`to\`,
+                        \`from\`
+                    ORDER BY
+                        maxDate DESC
+                    ) AS l ON l.to = m.to
+                    AND l.from = m.from
+                    AND l.maxDate = STR_TO_DATE(m.\`createdAt\`, '%Y-%m-%d %H:%i:%s')
+                WHERE
+                    m.to = '${uuid}'
+                    OR m.from = '${uuid}'
+                ) t2
+            WHERE
+                t1.to = t2.from
+                AND t1.from = t2.to
+        )`;
+
+        const friendChats = await sequelize.query(latestChats, { type: QueryTypes.SELECT });
+        console.log(friendChats);
+
         var friendListArray = selfDetails[0].friend_list
 
         let sortedUserDetails = othersDetails.sort(function (a, b) {
             return friendListArray.indexOf(a.uuid) - friendListArray.indexOf(b.uuid);
         });
+        console.log(sortedUserDetails)
+
+
+        for (friendKey in friendChats) {
+            if (friendChats[friendKey]['from'] != uuid) {
+                for (sortedUserKey in sortedUserDetails) {
+                    if (sortedUserDetails[sortedUserKey]['uuid'] == friendChats[friendKey]['from']) {
+                        sortedUserDetails[sortedUserKey]['chat'] = friendChats[friendKey]
+                    }
+                }
+            }
+            else {
+                for (sortedUserKey in sortedUserDetails) {
+                    if (sortedUserDetails[sortedUserKey]['uuid'] == friendChats[friendKey]['to']) {
+                        sortedUserDetails[sortedUserKey]['chat'] = friendChats[friendKey]
+                    }
+                }
+            }
+        };
+
+        console.log(sortedUserDetails);
+
 
         const result = compileTemplate({
             path: __dirname + "/../views/partials/friendList.ejs",

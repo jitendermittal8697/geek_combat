@@ -1,7 +1,4 @@
 const { User } = require('../model/user')
-const { io } = require('../utils/socket')
-const { online_users } = require('../utils/onlineUser')
-const { Sequelize } = require('sequelize');
 
 const signup = async (req, res) => {
 
