@@ -81,6 +81,71 @@
       });
     }
 
+    var final_transcript = "";
+    var recognizing = false;
+    var ignore_onend;
+    var recognition;
+
+    function speechToText() {
+
+      recognition.continuous = true;
+      recognition.interimResults = true;
+
+      recognition.onstart = function () {
+        recognizing = true;
+      };
+
+      recognition.onerror = function (event) {
+          ignore_onend = true;
+      };
+
+      recognition.onend = function () {
+        recognizing = false;
+        if (ignore_onend) {
+          return;
+        }
+        if (!final_transcript) {
+          return;
+        }
+      };
+
+      recognition.onresult = function (event) {
+        var interim_transcript = "";
+        if (typeof event.results == "undefined") {
+          recognition.onend = null;
+          recognition.stop();
+          return;
+        }
+        for (var i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            final_transcript += event.results[i][0].transcript;
+          } else {
+            interim_transcript += event.results[i][0].transcript;
+          }
+        }
+        final_span.innerHTML = final_transcript;
+        interim_span.innerHTML = interim_transcript;
+      };
+    }
+
+    function startButton() {
+      if (!("webkitSpeechRecognition" in window)) {
+        console.log("Not Supported")
+      }
+      else {
+        recognition = new webkitSpeechRecognition();
+        if (recognizing) {
+          recognition.stop();
+          return;
+        }
+        final_transcript = "";
+        recognition.start();
+        ignore_onend = false;
+        final_span.innerHTML = "";
+        interim_span.innerHTML = "";
+      }
+    }
+
     var debounceRefreshFriendListTimeout = null;
     var debounceRefreshClientCallback = function (socket_data) {
       var refreshFriendList = function (socket_data) {
