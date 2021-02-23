@@ -239,3 +239,29 @@
   margin-bottom: 0px;
 }
 
+.speech_to_text {
+  position: relative;
+  width: 100%;
+}
+
+.results {
+  font-size: 14px;
+  font-weight: bold;
+  position: fixed;
+  height: 170px;
+  background: #d8d2d2;
+  width: 55%;
+  top: 100px;
+  margin-left: 65px;
+  border-radius: 20px;
+}
+
+#final_span {
+  color: black;
+  line-height: 20px;
+  font-size: 16px;
+}
+
+#interim_span {
+  color: gray;
+}
