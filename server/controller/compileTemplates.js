@@ -33,36 +33,8 @@ const compileFriendListTemplate = async (req, res) => {
     let uuid = req.session.userDetails.uuid;
     if (uuid) {
 
-        // const sequelize = await dbconn()
         let UserModel = await User();
 
-        // const tempSQL = sequelize.dialect.queryGenerator.selectQuery('users', {
-        //     attributes: ['friend_list'],
-        //     where: {
-        //         uuid: uuid
-        //     }
-        // }).slice(0, -1);
-
-        // console.log(tempSQL);
-
-        // let friends = await UserModel.findAll({
-        //     where: {
-        //         uuid: {
-        //             [Sequelize.Op.in]: Sequelize.literal(`(${tempSQL})`)
-        //         }
-        //     }
-        // });
-
-        // let newUsers = await UserModel.findAll({
-        //     where: {
-        //         uuid: {
-        //             [Sequelize.Op.notIn]: Sequelize.literal(`(${tempSQL})`)
-        //         }
-        //     }
-        // });
-
-        // console.log(friends, newUsers)
-        // let userDetails = [...friends, ...newUsers];
         let othersDetails = await UserModel.findAll({
             where: {
                 uuid: { [Sequelize.Op.not]: uuid }
