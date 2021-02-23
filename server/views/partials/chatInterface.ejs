@@ -12,8 +12,30 @@
 
     <%- include('chatBody', {friend:friend, chats: chats}); %>
     </div>
+
+    <div class="custom-file-container" data-upload-id="myUploader">
+        <div style="display: none;">
+        <a href="javascript:void(0)" class="custom-file-container__image-clear" title="Clear Image">&times;</a>
+        <label class="custom-file-container__custom-file">
+            <input
+                type="file"
+                class="custom-file-container__custom-file__custom-file-input"
+                accept="*"
+                multiple
+                aria-label="Choose File"
+            />
+            <input type="hidden" name="MAX_FILE_SIZE" value="10485760" />
+            <span
+                class="custom-file-container__custom-file__custom-file-control"
+            ></span>
+        </label>
+        </div>
+        <div class="custom-file-container__image-preview" style="overflow-x: hidden;"></div>
+    </div>
+
     <form class="msger-inputarea">
         <input type="text" class="msger-input" placeholder="Enter your message..." name="message">
+        <i id="file-upload" class="fa fa-paperclip" aria-hidden="true" style="font-size: 30px;padding: 5px;"></i>
         <button type="submit" class="msger-send-btn">Send</button>
     </form>
 <% } else { %>

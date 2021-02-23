@@ -37,6 +37,7 @@ app.use(session({
 
 app.use('/static', express.static(path.join(__dirname, '/server/public/css')))
 app.use('/images', express.static(path.join(__dirname, '/server/public/images')))
+app.use('/js', express.static(path.join(__dirname, '/server/public/js')))
 
 
 app.post('/action', login)

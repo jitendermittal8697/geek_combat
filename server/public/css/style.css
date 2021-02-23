@@ -121,7 +121,8 @@
   font-size: 22px;
 }
 
-.friend-chat-head .name, .chat-interface-head .friend-details .name {
+.friend-chat-head .name,
+.chat-interface-head .friend-details .name {
   text-transform: capitalize;
 }
 .msger-chat {
@@ -190,11 +191,9 @@
 
 .msger-inputarea {
   display: flex;
-  padding: 10px;
+  padding: 10px !important;
   border-top: 2px solid #ddd;
   background: #eee;
-}
-.msger-inputarea * {
   padding: 10px;
   border: none;
   border-radius: 3px;
@@ -203,6 +202,7 @@
 .msger-input {
   flex: 1;
   background: #ddd;
+  padding: 12px;
 }
 .msger-send-btn {
   margin-left: 10px;
@@ -210,7 +210,32 @@
   color: #fff;
   font-weight: bold;
   cursor: pointer;
+  padding: 10px;
+  font-size: 15px;
 }
 .msger-send-btn:hover {
   background: rgb(0, 180, 50);
 }
+
+.custom-file-container {
+  position: absolute;
+  right: 0;
+  bottom: 60px;
+  width: 65%;
+  min-width: calc(100wh - 350px);
+  margin-bottom: 0px;
+  display: none;
+}
+
+.custom-file-container__image-multi-preview {
+  margin: 15px 15px;
+  width: 29%;
+  height: 220px;
+  background-size: contain;
+  background-position: 50% 20%;
+}
+
+.custom-file-container__image-preview {
+  margin-bottom: 0px;
+}
+

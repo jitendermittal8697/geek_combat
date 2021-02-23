@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css"/>
+    <link rel="stylesheet" href="/static/file-upload-with-preview.min.css"/>
     <link rel="stylesheet" href="/static/style.css" />
   </head>
   <body>
@@ -21,6 +23,7 @@
   <script>
     var socket = io({ transports: ["websocket"], upgrade: false });
     socket.emit("connecting", { uuid: $(".user-profile").data("uuid") });
+    var upload;
 
     function prepareTextMsgBubble(data) {
       return (
@@ -70,6 +73,14 @@
       $(".msger-input").val("");
     }
 
+    function fileUploadPreview() {
+      $.getScript('/js/file-upload-with-preview.min.js', function () {
+        upload = new FileUploadWithPreview('myUploader',{
+          showDeleteButtonOnImages: true
+        })
+      });
+    }
+
     var debounceRefreshFriendListTimeout = null;
     var debounceRefreshClientCallback = function (socket_data) {
       var refreshFriendList = function (socket_data) {
@@ -113,6 +124,7 @@
           success: function (result) {
             $(".right-wrap").html(result.html);
             scrollChatBox();
+            fileUploadPreview();
           },
           error: function (error) {
             console.log(error);
@@ -161,6 +173,10 @@
       scrollChatBox();
     });
 
+    $(document).on("click", "#file-upload", function (evt) {
+      $('.custom-file-container__custom-file__custom-file-input').trigger('click')
+    });
+
     var refreshMessageList = function () {
       $.ajax({
         type: "POST",
@@ -187,5 +203,14 @@
         },
       });
     };
+
+    $(document).on("DOMSubtreeModified", ".custom-file-container", function(){
+      if (upload != undefined && upload.currentFileCount) {
+        $(".custom-file-container").show()
+      }
+      else {
+        $(".custom-file-container").hide()
+      }
+    });
   </script>
 </html>
