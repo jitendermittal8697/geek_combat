@@ -51,6 +51,31 @@
       );
     }
 
+    function prepareFileMsgBubble(data) {
+      return (
+        `<div class="msg ` +
+        data.msg_class +
+        `">
+            <div class="msg-img" style="background-image: url('/images/male_avatar.png');"></div>
+            <div class="msg-bubble">
+                <div class="msg-info">
+                    <div class="msg-info-name"> ` +
+        data.username +
+        `</div>
+                    <div class="msg-info-time">` +
+        new Date().getHours().toString().padStart(2, "0") +
+        ":" +
+        new Date().getMinutes().toString().padStart(2, "0") +
+        `</div>
+                </div>
+                <div class="msg-text">` +
+        data.file_msg +
+        `</div>
+            </div>
+        </div>`
+      );
+    }
+
     function capitalizeText(text) {
       return text.replace(/^\w/, (c) => c.toUpperCase());
     }
@@ -68,6 +93,10 @@
 
     function appendTextMsgBubble(data) {
       $(".msger-chat").append(prepareTextMsgBubble(data));
+    }
+
+    function appendFileMsgBubble(data) {
+      $(".msger-chat").append(prepareFileMsgBubble(data));
     }
 
     function clearTextArea() {
@@ -221,7 +250,7 @@
       }
     }
 
-    function uploadFilesToServer() {
+    function uploadFilesToServer(callback) {
       let formElement = document.getElementById('entry-form');
       let formData = new FormData(formElement);
       for (key in upload.cachedFileArray) {
@@ -238,14 +267,11 @@
         processData: false,
         cache: false,
         success: function(data) {
-          console.log(data)
+          callback(data)
         },
         error: function(error) {
           console.log(error)
         },
-        complete: function(data) {
-          console.log(data)
-        }
       })
     }
 
@@ -277,7 +303,17 @@
         txt_msg: data.message,
       });
     };
+
+    var appendFileMessageBubble = function (data) {
+      appendFileMsgBubble({
+        msg_class: "left-msg",
+        username: capitalizeText(data.name),
+        txt_msg: data.message,
+      });
+    };
+
     socket.on("trigger_text_message", appendTextMessageBubble);
+    socket.on("trigger_file_message", appendFileMessageBubble);
 
     var sendMessage = function (data) {
       if (data.data.friendDetails.uuid != $(".friend-details").data("uuid")) {
@@ -318,6 +354,32 @@
     $(document).on("click", ".msger-send-btn", function (evt) {
       evt.preventDefault();
 
+      if(upload && upload.currentFileCount) {
+
+        uploadFilesToServer(function(data){
+          appendFileMsgBubble({
+            msg_class: "right-msg",
+            username: "You",
+            file_msg: $(".msger-input").val(),
+          });
+          socket.emit("send_file_message", {
+            friendDetails: {
+              uuid: $(".friend-details").data("uuid"),
+            },
+            selfDetails: {
+              uuid: $(".user-profile").data("uuid"),
+            },
+            msgDetails: {
+              messageType: "file",
+              message: data.data.join(' , '),
+            },
+          })
+          upload.clearPreviewPanel();
+          $(".custom-file-container").trigger('DOMSubtreeModified')
+        });
+
+        return;
+      }
       appendTextMsgBubble({
         msg_class: "right-msg",
         username: "You",

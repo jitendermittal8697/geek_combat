@@ -158,6 +158,10 @@
   background: #579ffb;
 }
 
+.msg-text {
+  word-wrap: break-word;
+}
+
 .msg-info {
   display: flex;
   justify-content: space-between;

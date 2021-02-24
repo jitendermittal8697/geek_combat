@@ -8,7 +8,7 @@
                 <%= friend.username %>
             </div>
             <div class="last-message">
-                <%= friend.chat.message %>
+                <%= friend.chat.message.slice(0, 40) + (friend.chat.message.length > 40 ? "..." : "") %>
             </div>
         </div>
         <div class="other-details">

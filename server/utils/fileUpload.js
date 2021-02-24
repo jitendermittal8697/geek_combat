@@ -38,11 +38,15 @@ let fileUpload = (req, res) => {
                     if (!fileArray[count]) {
                         console.log('completed')
                         console.log(result);
+                        res.status(200).send({
+                            response: true,
+                            data: result
+                        })
                         return;
                     }
                     let fileMetadata = {
                         'name': fileArray[count]["name"],
-                        parents: ["1BCP3tfA1gVxOFzWnvIrPPsrJP5uT4e8P"]
+                        parents: [process.env.GDRIVE_FOLDER_ID]
                     };
                     let media = {
                         mimeType: fileArray[count]["type"],
@@ -54,12 +58,46 @@ let fileUpload = (req, res) => {
                         fields: "id",
                     }, (err, file) => {
                         if (err) {
+                            res.status(500).send({
+                                response: false,
+                                message: "Request unsuccessful !!" + err
+                            })
                             // Handle error
                             console.error(err);
                         } else {
-                            console.log(file);
-                            result.push(result)
-                            uploadToDrive(fileArray)
+                            // console.log(file);
+                            // console.log(file.data);
+                            // drive.permissions.create({
+                            //     resource: {
+                            //         'type': 'domain',
+                            //         'role': 'reader',
+                            //         'domain': 'localhost:3000'
+                            //     },
+                            //     fileId: file.data.id,
+                            //     fields: 'id',
+                            //     // requestBody: {
+                            //     //     role: 'reader',
+                            //     //     type: 'anyone',
+                            //     // }
+                            // }, async (err, file) => {
+                            //     if (err) {
+                                    // res.status(500).send({
+                                    //     response: false,
+                                    //     message: "Request unsuccessful !!" + err
+                                    // })
+                                    // Handle error
+                                //     console.error(err);
+                                // } else {
+                                    drive.files.get({
+                                        fileId: file.data.id,
+                                        fields: 'webViewLink'
+                                    }).then(response => {
+
+                                        result.push(response.data.webViewLink)
+                                        uploadToDrive(fileArray)
+                                    });
+                            //     }
+                            // });
                         }
                     });
                     count++;
@@ -73,7 +111,7 @@ let fileUpload = (req, res) => {
 }
 
 module.exports = {
-    fileUpload
+    fileUpload,
 }
 
 

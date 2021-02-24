@@ -1,11 +1,115 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <link rel="stylesheet" href="/static/signup_modal.css">
-</head>
-<body>
 
-<h2>Geek Combat Signup Form</h2>
+<head>
+  <link rel="stylesheet" href="/static/signup_modal.css">
+  <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet"/>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+</head>
+
+<body>
+  <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,700' rel='stylesheet' type='text/css'>
+
+  <div class="container">
+    <div class="frame">
+      <div class="nav">
+        <ul class="links">
+          <li class="signin-active"><a class="btn">Sign in</a></li>
+          <li class="signup-inactive"><a class="btn">Sign up </a></li>
+        </ul>
+      </div>
+      <div>
+        <form class="form-signin" action="/login" method="post" name="form">
+          <label for="username">Username</label>
+          <input class="form-styling" type="text" name="username" placeholder="" />
+          <label for="password">Password</label>
+          <input class="form-styling" type="text" name="password" placeholder="" />
+          <div class="btn-animate">
+            <button type="submit" class="signupbtn" hidden>Sign Up</button>
+            <a class="btn-signin">Sign in</a>
+          </div>
+        </form>
+
+        <form class="form-signup" action="/signup" method="post" name="form">
+          <div class="container">
+            <div class="avatar-upload">
+              <div class="avatar-edit">
+                <input type='file' id="imageUpload" accept=".png, .jpg, .jpeg" />
+                <label for="imageUpload"></label>
+              </div>
+              <div class="avatar-preview">
+                <div id="imagePreview" style="background-image: url(http://i.pravatar.cc/500?img=7);">
+                </div>
+              </div>
+            </div>
+          </div>
+          <label for="username">Full name</label>
+          <input class="form-styling" type="text" name="username" placeholder="" />
+          <label for="email">Email</label>
+          <input class="form-styling" type="text" name="email" placeholder="" />
+          <label for="password">Password</label>
+          <input class="form-styling" type="text" name="password" placeholder="" />
+          <a class="btn-signup">Sign Up</a>
+        </form>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    $(function () {
+      $(".btn").click(function () {
+        $(".form-signin").toggleClass("form-signin-left");
+        $(".form-signup").toggleClass("form-signup-left");
+        $(".frame").toggleClass("frame-long");
+        $(".signup-inactive").toggleClass("signup-active");
+        $(".signin-active").toggleClass("signin-inactive");
+        $(".forgot").toggleClass("forgot-left");
+        $(this).removeClass("idle").addClass("active");
+      });
+    });
+
+    $(function () {
+      $(".btn-signup").click(function () {
+        $(".nav").toggleClass("nav-up");
+        $(".form-signup-left").toggleClass("form-signup-down");
+        $(".success").toggleClass("success-left");
+        $(".frame").toggleClass("frame-short");
+      });
+    });
+
+    $(function () {
+      $(".btn-signin").click(function () {
+        $(".btn-animate").toggleClass("btn-animate-grow");
+        $(".welcome").toggleClass("welcome-left");
+        $(".cover-photo").toggleClass("cover-photo-down");
+        $(".frame").toggleClass("frame-short");
+        $(".profile-photo").toggleClass("profile-photo-down");
+        $(".btn-goback").toggleClass("btn-goback-up");
+        $(".forgot").toggleClass("forgot-fade");
+      });
+    });
+
+    $('.btn-signin').click(function (params) {
+      $('.signupbtn').trigger('click')
+    })
+
+    function readURL(input) {
+      if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          $('#imagePreview').css('background-image', 'url(' + e.target.result + ')');
+          $('#imagePreview').hide();
+          $('#imagePreview').fadeIn(650);
+        }
+        reader.readAsDataURL(input.files[0]);
+      }
+    }
+    $("#imageUpload").change(function () {
+      readURL(this);
+    });
+  </script>
+  <!-- <h2>Geek Combat Signup Form</h2>
 
 <div class="modal">
   <form class="modal-content" method="POST" action="/action">
@@ -23,7 +127,8 @@
       </div>
     </div>
   </form>
-</div>
+</div> -->
 
 </body>
+
 </html>

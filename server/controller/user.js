@@ -39,7 +39,7 @@ const login = async (req, res) => {
             res.redirect('/chats');
         }
         else {
-            res.redirect('/signup');
+            res.redirect('/geek-combat');
         }
     }
     catch (error) {

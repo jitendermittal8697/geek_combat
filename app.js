@@ -41,8 +41,9 @@ app.use('/images', express.static(path.join(__dirname, '/server/public/images'))
 app.use('/js', express.static(path.join(__dirname, '/server/public/js')))
 
 
-app.post('/action', login)
-app.get('/signup', redirectUserCallback)
+app.post('/login', login)
+app.post('/signup', signup)
+app.get('/geek-combat', redirectUserCallback)
 
 app.use(checkSession);
 
@@ -60,6 +61,11 @@ app.post('/upload/files', fileUpload)
 io.on('connection', (socket) => {
 
     async function insertTextChat(chatObj) {
+        let ChatModel = await Chat();
+        await ChatModel.create(chatObj);
+    }
+
+    async function insertFileChat(chatObj) {
         let ChatModel = await Chat();
         await ChatModel.create(chatObj);
     }
@@ -153,6 +159,35 @@ io.on('connection', (socket) => {
         online_users[receiverUuid]["friend_list"] = [...new Set([senderUuid, ...new Set(online_users[receiverUuid]["friend_list"])])]
 
         io.to(receiverSocketID).emit('trigger_text_message', { name: senderName, message: msg, type: msgType });
+        console.log("After Connection", online_users)
+    })
+
+    socket.on('send_file_message', async (data) => {
+
+        let senderUuid = data.selfDetails.uuid;
+        let receiverUuid = data.friendDetails.uuid;
+        let receiverSocketID = online_users[receiverUuid]["socket_id"];
+        let senderName = online_users[senderUuid]['username'];
+        let msgType = data.msgDetails.messageType;
+        let msg = data.msgDetails.message;
+
+        insertFileChat({
+            from: senderUuid,
+            to: receiverUuid,
+            msg_type: msgType,
+            message: msg,
+        })
+
+        if (online_users[senderUuid]["friend_list"].indexOf(receiverUuid) == -1) {
+            addToFriendList({
+                senderUuid: senderUuid,
+                receiverUuid: receiverUuid,
+            })
+        }
+        online_users[senderUuid]["friend_list"] = [...new Set([receiverUuid, ...new Set(online_users[senderUuid]["friend_list"])])]
+        online_users[receiverUuid]["friend_list"] = [...new Set([senderUuid, ...new Set(online_users[receiverUuid]["friend_list"])])]
+
+        io.to(receiverSocketID).emit('trigger_file_message', { name: senderName, message: msg, type: msgType });
         console.log("After Connection", online_users)
     })
 
