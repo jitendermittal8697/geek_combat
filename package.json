@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "start": "supervisor app.js",
-    "gtoken": "node server/utils/googleDrive.js",
+    "gdrive": "node server/utils/googleDrive.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
@@ -19,6 +19,7 @@
     "express": "^4.17.1",
     "express-session": "^1.17.1",
     "express-validator": "^6.9.2",
+    "formidable": "^1.2.2",
     "fs": "^0.0.1-security",
     "fs-readfile-promise": "^3.0.1",
     "googleapis": "^67.1.0",

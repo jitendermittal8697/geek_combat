@@ -17,6 +17,7 @@
         []}); %>
       </div>
     </div>
+    <form id="entry-form" style="display:none" method="post" enctype="multipart/form-data"></form>
   </body>
   <script src="/socket.io/socket.io.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -218,6 +219,34 @@
         final_span.innerHTML = "";
         interim_span.innerHTML = "";
       }
+    }
+
+    function uploadFilesToServer() {
+      let formElement = document.getElementById('entry-form');
+      let formData = new FormData(formElement);
+      for (key in upload.cachedFileArray) {
+          formData.append(upload.cachedFileArray[key].name, upload.cachedFileArray[key]);
+      }
+
+      $.ajax({
+        url: "/upload/files",
+        type: "POST",
+        dataType: "json",
+        async: true,
+        data: formData,
+        contentType: false,
+        processData: false,
+        cache: false,
+        success: function(data) {
+          console.log(data)
+        },
+        error: function(error) {
+          console.log(error)
+        },
+        complete: function(data) {
+          console.log(data)
+        }
+      })
     }
 
     var debounceRefreshFriendListTimeout = null;

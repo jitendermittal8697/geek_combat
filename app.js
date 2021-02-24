@@ -16,6 +16,7 @@ const { io } = require('./server/utils/socket')
 const { online_users } = require('./server/utils/onlineUser')
 const { User } = require('./server/model/user')
 const { Chat } = require('./server/model/chat')
+const { fileUpload } = require('./server/utils/fileUpload')
 const _ = require('lodash')
 
 if (process.env.NODE_ENV !== 'production') {
@@ -52,6 +53,8 @@ app.get('/chats', function (req, res) {
 app.post('/compile/template/friend-list', compileFriendListTemplate)
 app.post('/compile/template/chat-body', compilePrivateChatBodyTemplate)
 app.post('/compile/template/chat-interface', compileChatInterfaceTemplate)
+
+app.post('/upload/files', fileUpload)
 
 // app.all('*', redirectUserCallback)
 io.on('connection', (socket) => {
