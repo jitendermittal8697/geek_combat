@@ -81,18 +81,80 @@
       });
     }
 
+    function clearSpeechInput() {
+      final_transcript = "";
+      // ignore_onend = false;
+      final_span.innerHTML = "";
+      interim_span.innerHTML = "";
+      addAttributeToSpeechControls(true)
+
+    }
+
+    function editSpeechInput() {
+      // recognition.onend()
+      recognition.stop()
+      placeCaretAtEnd( document.getElementById('final_span') );
+    }
+
+    function placeCaretAtEnd(el) {
+      el.focus();
+      if (typeof window.getSelection != "undefined"
+              && typeof document.createRange != "undefined") {
+        var range = document.createRange();
+        range.selectNodeContents(el);
+        range.collapse(false);
+        var sel = window.getSelection();
+        sel.removeAllRanges();
+        sel.addRange(range);
+      } else if (typeof document.body.createTextRange != "undefined") {
+        var textRange = document.body.createTextRange();
+        textRange.moveToElementText(el);
+        textRange.collapse(false);
+        textRange.select();
+      }
+    }
+
+    function sendSpeechInput() {
+      // recognition.onend()
+      recognition.stop()
+      console.log(final_span.innerHTML)
+      $('.msger-input').val(final_span.innerHTML)
+      console.log(final_span.innerHTML)
+
+      clearSpeechInput()
+      $('.speech_to_text').hide()
+      setTimeout(() => {
+        $('.msger-send-btn').trigger('click')
+      }, 1000);
+    }
+
+    function addAttributeToSpeechControls(action) {
+      console.log(action)
+      if(action) {
+        $('.stt-send-btn').attr("disabled",true)
+        $('.stt-clear-btn').attr("disabled",true)
+        $('.stt-edit-btn').attr("disabled",true)
+      }
+      else{
+        $('.stt-send-btn').removeAttr("disabled")
+        $('.stt-clear-btn').removeAttr("disabled")
+        $('.stt-edit-btn').removeAttr("disabled")
+      }
+    }
+
     var final_transcript = "";
     var recognizing = false;
     var ignore_onend;
     var recognition;
 
     function speechToText() {
-
-      recognition.continuous = true;
+      recognition.continuous = false;
       recognition.interimResults = true;
 
       recognition.onstart = function () {
         recognizing = true;
+        $('.microphone').removeClass('fa-microphone-slash')
+        $('.microphone').addClass('fa-microphone')
       };
 
       recognition.onerror = function (event) {
@@ -101,6 +163,10 @@
 
       recognition.onend = function () {
         recognizing = false;
+        console.log('incoming')
+        addAttributeToSpeechControls(false)
+        $('.microphone').removeClass('fa-microphone-slash')
+        $('.microphone').addClass('fa-microphone-slash')
         if (ignore_onend) {
           return;
         }
@@ -134,6 +200,8 @@
       }
       else {
         recognition = new webkitSpeechRecognition();
+        $('.speech_to_text').show()
+        addAttributeToSpeechControls(true)
         speechToText()
         if (recognizing) {
           recognition.stop();
@@ -242,6 +310,11 @@
     $(document).on("click", "#file-upload", function (evt) {
       $('.custom-file-container__custom-file__custom-file-input').trigger('click')
     });
+
+    $(document).on("click", ".stt-clear-btn", clearSpeechInput);
+    $(document).on("click", ".stt-edit-btn", editSpeechInput);
+    $(document).on("click", ".stt-send-btn", sendSpeechInput);
+    $(document).on("click", ".microphone", startButton);
 
     var refreshMessageList = function () {
       $.ajax({

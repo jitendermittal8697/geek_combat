@@ -242,9 +242,11 @@
 .speech_to_text {
   position: relative;
   width: 100%;
+  display: none;
 }
 
 .results {
+  padding: 10px;
   font-size: 14px;
   font-weight: bold;
   position: fixed;
@@ -257,6 +259,7 @@
 }
 
 #final_span {
+  outline: none;
   color: black;
   line-height: 20px;
   font-size: 16px;
@@ -264,4 +267,16 @@
 
 #interim_span {
   color: gray;
+}
+
+#stt-controls {
+  position: absolute;
+  top: 80%;
+  right: 19px;
+}
+
+.stt-close-btn {
+  top: -145px;
+  position: absolute;
+  right: 0px;
 }

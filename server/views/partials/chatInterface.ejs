@@ -34,12 +34,20 @@
     </div>
     <div class="speech_to_text">
         <div class="results">
-            <span id="final_span"></span>
+            <span id="final_span" contenteditable="true"></span>
             <span id="interim_span"></span>
-
+            <div id="stt-controls">
+                <i class="fas fa-times stt-close-btn" aria-hidden="true"></i>
+                <button type="submit" class="stt-clear-btn">Clear</button>
+                <button type="submit" class="stt-edit-btn">Edit Before Send</button>
+                <button type="submit" class="stt-send-btn">Send</button>
+            </div>
         </div>
+
     </div>
     <form class="msger-inputarea">
+        <i class="fas fa-microphone-slash microphone" aria-hidden="true" style="font-size: 25px;padding: 5px;display: flex;
+        align-self: center;"></i>
         <input type="text" class="msger-input" placeholder="Enter your message..." name="message">
         <i id="file-upload" class="fa fa-paperclip" aria-hidden="true" style="font-size: 25px;padding: 5px;display: flex;
         align-self: center;"></i>
