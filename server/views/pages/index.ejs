@@ -128,6 +128,11 @@
       }, 1000);
     }
 
+    function hideSpeechInput(params) {
+      recognition.stop()
+      $('.speech_to_text').hide()
+    }
+
     function addAttributeToSpeechControls(action) {
       console.log(action)
       if(action) {
@@ -165,7 +170,7 @@
         recognizing = false;
         console.log('incoming')
         addAttributeToSpeechControls(false)
-        $('.microphone').removeClass('fa-microphone-slash')
+        $('.microphone').removeClass('fa-microphone')
         $('.microphone').addClass('fa-microphone-slash')
         if (ignore_onend) {
           return;
@@ -315,6 +320,7 @@
     $(document).on("click", ".stt-edit-btn", editSpeechInput);
     $(document).on("click", ".stt-send-btn", sendSpeechInput);
     $(document).on("click", ".microphone", startButton);
+    $(document).on("click", ".stt-close-btn", hideSpeechInput);
 
     var refreshMessageList = function () {
       $.ajax({
