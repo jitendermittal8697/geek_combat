@@ -12,7 +12,7 @@
             <div class="msg-bubble">
                 <div class="msg-info">
                     <div class="msg-info-name"><%= sender_name %></div>
-                    <div class="msg-info-time"><%= new Date(chat.createdAt).getHours().toString().padStart(2, "0") %>:<%= new Date(chat.createdAt).getMinutes().toString().padStart(2, "0"); %></div>
+                    <div class="msg-info-time"><%= new Date(chat.createdAt).toUTCString().substring(17,22) %></div>
                 </div>
                 <div class="msg-text"><%= chat.message %></div>
             </div>

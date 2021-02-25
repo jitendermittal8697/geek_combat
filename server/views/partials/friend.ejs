@@ -1,5 +1,5 @@
 <li class="friend-list" data-uuid="<%= friend.uuid %>">
-    <div class="friend-chat-head">
+    <div class="friend-chat-head <%= usersContacted && usersContacted.includes(friend.uuid) ? 'highlight' : '' %>">
         <div class="user-profile">
             <img src="<%= friend.profile_image %>">
         </div>
@@ -9,12 +9,14 @@
                 <i class="fas fa-toggle-<%= onlineUsers[friend.uuid] != undefined ? 'on' : 'off' %> online-status"></i>
             </div>
             <div class="last-message">
-                <%= friend.chat.message.slice(0, 40) + (friend.chat.message.length > 40 ? "..." : "") %>
+                <%= friend.chat ? (friend.chat.message.slice(0, 40) + (friend.chat.message.length > 40 ? "..." : "")) : "" %>
             </div>
         </div>
         <div class="other-details">
             <div class="last-message-date">
-                <%= new Date(friend.chat.createdAt).getHours().toString().padStart(2, "0") %>:<%= new Date(friend.chat.createdAt).getMinutes().toString().padStart(2, "0"); %>
+                <% if (friend.chat) { %>
+                    <%= new Date(friend.chat.createdAt).toUTCString().substring(17,22) %>
+                <% } %>
             </div>
         </div>
     </div>

@@ -1,7 +1,7 @@
 <ul class="friend-wrapper">
   <% if (friends != undefined ) { %>
     <% friends.forEach(function(friend){ %>
-      <%- include('friend', {friend: friend, onlineUsers: onlineUsers}); %>
+      <%- include('friend', {friend: friend, onlineUsers: onlineUsers, usersContacted: usersContacted}); %>
     <% }); %>
   <% } %>
 </ul>

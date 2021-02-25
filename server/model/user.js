@@ -70,15 +70,22 @@ const UserModel = async () => {
             last_login: {
                 type: Sequelize.DATE,
                 allowNull: false,
-                defaultValue: new Date((new Date()).getTime() - 19800000)
+                defaultValue: new Date((new Date()).getTime() + 19800000)
             },
+            createdAt: {
+                type: Sequelize.DATE,
+                defaultValue: new Date((new Date()).getTime() + 19800000)
+            },
+            updatedAt: {
+                type: Sequelize.DATE,
+                defaultValue: new Date((new Date()).getTime() + 19800000)
+            }
         }, {
             indexes: [
                 { unique: true, fields: ['username'] },
                 { unique: true, fields: ['uuid'] }
             ],
             tableName: 'users',
-            timezone: 'Asia/Calcutta', dialectOptions: { timezone: 'Asia/Calcutta', },
         });
 
         User.sync({ alter: true })

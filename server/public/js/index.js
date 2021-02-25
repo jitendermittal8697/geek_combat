@@ -287,7 +287,6 @@ var appendTextMessageBubble = function (data) {
         txt_msg: data.message,
     });
     $(`li[data-uuid="${data.senderUuid}"] .friend-chat-head`).css('font-weight', 'bolder');
-    // $('.friend-chat-head').css('font-weight', 'bolder');
     moveChat({message: data.message, uuid: data.senderUuid})
 };
 

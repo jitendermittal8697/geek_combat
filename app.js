@@ -137,8 +137,6 @@ io.on('connection', (socket) => {
 
         let senderUuid = data.selfDetails.uuid;
         let receiverUuid = data.friendDetails.uuid;
-        let receiverSocketID = online_users[receiverUuid]["socket_id"];
-        let senderName = online_users[senderUuid]['username'];
         let msgType = data.msgDetails.messageType;
         let msg = data.msgDetails.message;
 
@@ -155,10 +153,15 @@ io.on('connection', (socket) => {
                 receiverUuid: receiverUuid,
             })
         }
-        online_users[senderUuid]["friend_list"] = [...new Set([receiverUuid, ...new Set(online_users[senderUuid]["friend_list"])])]
-        online_users[receiverUuid]["friend_list"] = [...new Set([senderUuid, ...new Set(online_users[receiverUuid]["friend_list"])])]
+        if (online_users[receiverUuid] && online_users[receiverUuid]["friend_list"]) {
+            online_users[senderUuid]["friend_list"] = [...new Set([receiverUuid, ...new Set(online_users[senderUuid]["friend_list"])])]
+            online_users[receiverUuid]["friend_list"] = [...new Set([senderUuid, ...new Set(online_users[receiverUuid]["friend_list"])])]
 
-        io.to(receiverSocketID).emit('trigger_text_message', { name: senderName, message: msg, type: msgType, senderUuid: senderUuid });
+            let receiverSocketID = online_users[receiverUuid]["socket_id"];
+            let senderName = online_users[senderUuid]['username'];
+
+            io.to(receiverSocketID).emit('trigger_text_message', { name: senderName, message: msg, type: msgType, senderUuid: senderUuid });
+        }
     })
 
     socket.on('send_file_message', async (data) => {

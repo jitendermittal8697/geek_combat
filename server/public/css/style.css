@@ -284,3 +284,7 @@
   position: absolute;
   right: 0px;
 }
+
+.highlight {
+  font-weight: bolder;
+}

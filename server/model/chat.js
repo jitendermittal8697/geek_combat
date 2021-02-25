@@ -31,12 +31,19 @@ const ChatModel = async () => {
                 type: DataTypes.STRING,
                 allowNull: false
             },
+            createdAt: {
+                type: Sequelize.DATE,
+                defaultValue: new Date((new Date()).getTime() + 19800000)
+            },
+            updatedAt: {
+                type: Sequelize.DATE,
+                defaultValue: new Date((new Date()).getTime() + 19800000)
+            }
         }, {
             indexes: [
                 { unique: true, fields: ['uuid'] }
             ],
             tableName: 'chat',
-            timezone: 'Asia/Calcutta', dialectOptions: { timezone: 'Asia/Calcutta', },
         });
 
         Chat.sync({ alter: true })

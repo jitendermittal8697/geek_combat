@@ -28,6 +28,30 @@ async function compileTemplate(data) {
     }
 }
 
+async function getUnreceivedMessages(uuid) {
+
+    const sequelize = await dbconn()
+
+    let unreceivedChatsQuery = `select
+        DISTINCT(\`from\`)
+    from
+        chat
+    where
+        \`to\` = '${uuid}'
+        and createdAt > (
+        select
+            last_login
+        from
+            users
+        where
+            uuid = '${uuid}'
+        );`
+
+    return sequelize.query(unreceivedChatsQuery, { type: QueryTypes.SELECT });
+
+}
+
+
 const compileFriendListTemplate = async (req, res) => {
 
     let uuid = req.session.userDetails.uuid;
@@ -118,8 +142,14 @@ const compileFriendListTemplate = async (req, res) => {
                     OR m.from = '${uuid}'
                 ) t2
             WHERE
-                t1.to = t2.from
-                AND t1.from = t2.to
+            (
+                t1.\`to\` = t2.\`from\`
+                AND t1.\`from\` = t2.\`to\`
+              )
+              OR (
+                t1.\`to\` = t2.\`to\`
+                AND t1.\`from\` = t2.\`from\`
+              )
         )`;
 
         const friendChats = await sequelize.query(latestChats, { type: QueryTypes.SELECT });
@@ -147,11 +177,23 @@ const compileFriendListTemplate = async (req, res) => {
             }
         };
 
-        sortedUserDetails.sort((a, b) => (a.chat.createdAt < b.chat.createdAt) ? 1 : -1)
+        sortedUserDetails = sortedUserDetails.sort((a, b) => {
+            if (!a.chat || !a.chat.createdAt) {
+                return 1;
+            } else if (!b.chat || !b.chat.createdAt) {
+                return -1;
+            } else {
+                return a.chat.createdAt < b.chat.createdAt ? 1 : -1
+            }
+        })
+
+        let usersContacted = await getUnreceivedMessages(uuid)
+
+        usersContacted = usersContacted.map(value => value.from);
 
         const result = compileTemplate({
             path: __dirname + "/../views/partials/friendList.ejs",
-            templateData: { friends: sortedUserDetails, onlineUsers: online_users },
+            templateData: { friends: sortedUserDetails, onlineUsers: online_users, usersContacted: usersContacted },
         })
 
         result.then(function (data) {
