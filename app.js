@@ -119,16 +119,18 @@ io.on('connection', (socket) => {
         let userDetails = await UserModel.findAll({
             where: { uuid: userid }
         });
+        let socketId = socket.id
 
         online_users[userid] = {
             "uuid": userid,
-            "socket_id": socket.id,
+            "socket_id": socketId,
             "username": userDetails[0].username,
             "profile_image": userDetails[0].profile_image,
             "friend_list": userDetails[0].friend_list,
         }
 
-        io.emit('connect_client', {});
+        socket.emit('connect_client', {});
+        socket.broadcast.emit('new_user_online', {userDetails: {userid: userid}});
         console.log("After Connection", online_users)
     })
 

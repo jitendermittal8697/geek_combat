@@ -10,7 +10,7 @@
       <div class="left-wrap">
         <% friends = data.online_users %> <%- include('../partials/header',
         {appData: appData, userDetails: data.userDetails}); %> <%-
-        include('../partials/friendList', {friends: friends}); %>
+        include('../partials/friendList', {friends: friends, onlineUsers: data.online_users}); %>
       </div>
       <div class="right-wrap">
         <%- include('../partials/chatInterface', {friend: {friends}, chats:
@@ -296,6 +296,13 @@
     socket.on("connect_client", debounceRefreshClientCallback);
     socket.on("disconnect_client", debounceRefreshClientCallback); // Todo: online / offline flag
 
+    var updateUserOnlineStatus = function (data) {
+      console.log(data)
+      console.log(data.userDetails)
+      console.log(data.userDetails.uuid)
+      $(`li[data-uuid="${data.userDetails.uuid}"] .online-status`).removeClass('fa-toggle-off').addClass('fa-toggle-on');
+    };
+
     var appendTextMessageBubble = function (data) {
       appendTextMsgBubble({
         msg_class: "left-msg",
@@ -312,6 +319,7 @@
       });
     };
 
+    socket.on('new_user_online', updateUserOnlineStatus);
     socket.on("trigger_text_message", appendTextMessageBubble);
     socket.on("trigger_file_message", appendFileMessageBubble);
 

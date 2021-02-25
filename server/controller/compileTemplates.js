@@ -155,7 +155,7 @@ const compileFriendListTemplate = async (req, res) => {
 
         const result = compileTemplate({
             path: __dirname + "/../views/partials/friendList.ejs",
-            templateData: { friends: sortedUserDetails },
+            templateData: { friends: sortedUserDetails, onlineUsers: online_users },
         })
 
         result.then(function (data) {

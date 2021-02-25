@@ -6,6 +6,7 @@
         <div class="details">
             <div class="name">
                 <%= friend.username %>
+                <i class="fas fa-toggle-<% if (onlineUsers.uuid != undefined) { %>on<% } else { %>off<% } %> online-status"></i>
             </div>
             <div class="last-message">
                 <%= friend.chat.message.slice(0, 40) + (friend.chat.message.length > 40 ? "..." : "") %>
