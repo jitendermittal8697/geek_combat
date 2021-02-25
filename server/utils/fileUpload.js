@@ -34,10 +34,7 @@ let fileUpload = (req, res) => {
                 let count = 0;
                 let result = [];
                 var uploadToDrive = function (fileArray) {
-                    console.log(count + 1)
                     if (!fileArray[count]) {
-                        console.log('completed')
-                        console.log(result);
                         res.status(200).send({
                             response: true,
                             data: result

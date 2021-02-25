@@ -123,15 +123,12 @@ const compileFriendListTemplate = async (req, res) => {
         )`;
 
         const friendChats = await sequelize.query(latestChats, { type: QueryTypes.SELECT });
-        console.log(friendChats);
 
         var friendListArray = selfDetails[0].friend_list
 
         let sortedUserDetails = othersDetails.sort(function (a, b) {
             return friendListArray.indexOf(a.uuid) - friendListArray.indexOf(b.uuid);
         });
-        console.log(sortedUserDetails)
-
 
         for (friendKey in friendChats) {
             if (friendChats[friendKey]['from'] != uuid) {
@@ -150,8 +147,7 @@ const compileFriendListTemplate = async (req, res) => {
             }
         };
 
-        console.log(sortedUserDetails);
-
+        sortedUserDetails.sort((a, b) => (a.chat.createdAt < b.chat.createdAt) ? 1 : -1)
 
         const result = compileTemplate({
             path: __dirname + "/../views/partials/friendList.ejs",
