@@ -336,3 +336,11 @@
   border-left: none;
   outline: none;
 }
+
+.fa-toggle-off {
+  color: red;
+}
+
+.fa-toggle-on {
+  color: green;
+}
