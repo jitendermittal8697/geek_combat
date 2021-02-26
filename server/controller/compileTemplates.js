@@ -150,7 +150,7 @@ const compileFriendListTemplate = async (req, res) => {
                 t1.\`to\` = t2.\`to\`
                 AND t1.\`from\` = t2.\`from\`
               )
-        )`;
+        ) ORDER BY createdAt`;
 
         const friendChats = await sequelize.query(latestChats, { type: QueryTypes.SELECT });
 
