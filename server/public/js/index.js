@@ -314,7 +314,7 @@ var appendTextMessageBubble = function (data) {
         username: capitalizeText(data.name),
         txt_msg: data.message,
     });
-    $(`li[data-uuid="${data.senderUuid}"] .friend-chat-head`).css('font-weight', 'bolder');
+    $(`li[data-uuid="${data.senderUuid}"] .friend-chat-head`).addClass('highlight')
     moveChat({ message: data.message, uuid: data.senderUuid })
 };
 
@@ -366,6 +366,7 @@ $(document).on("click", "li.friend-list", function (evt) {
             },
         },
     });
+    $(evt.target).removeClass("highlight")
     addEmojiToTextArea()
 });
 
@@ -402,6 +403,9 @@ $(document).on("click", ".msger-send-btn", function (evt) {
         return;
     }
     else {
+        if ($(".msger-input").val() == "") {
+            return;
+        }
         appendTextMsgBubble({
             msg_class: "right-msg",
             username: "You",
