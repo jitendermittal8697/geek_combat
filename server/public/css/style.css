@@ -63,10 +63,12 @@
 
 .chat-header .right-head p {
   font-size: 20px;
+  margin: 0px;
 }
 
 .chat-header .left-head p {
   text-transform: capitalize;
+  margin: 0px;
 }
 
 .user-profile img {
