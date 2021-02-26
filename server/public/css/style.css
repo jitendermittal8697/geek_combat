@@ -347,6 +347,7 @@
   outline: none;
 }
 
+<<<<<<< HEAD
 .emoji-picker-icon {
   cursor: pointer;
   position: relative;
@@ -372,4 +373,12 @@
 
 #file-upload {
   margin-left: -20px;
+=======
+.fa-toggle-off {
+  color: red;
+}
+
+.fa-toggle-on {
+  color: green;
+>>>>>>> 58e34b578b4ea8341f59f3a94110cdebdebed574
 }
