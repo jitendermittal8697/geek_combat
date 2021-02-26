@@ -8,9 +8,19 @@
   <body>
     <div class="geek-combat chat-app">
       <div class="left-wrap">
-        <% friends = data.online_users %> <%- include('../partials/header',
-        {appData: appData, userDetails: data.userDetails}); %> <%-
-        include('../partials/friendList', {friends: friends, onlineUsers: data.online_users}); %>
+        <% friends = data.online_users %>
+        <%- include('../partials/header', {appData: appData, userDetails: data.userDetails}); %>
+        <div class="wrapper">
+          <div class="container-search">
+            <div class="container-input">
+              <input type="text" list="psychology_theories_list" id="newers_search" class="search-term" placeholder="Search on newers name">
+              <button type="button" class="search-button" id="selectTheory">
+                <i class="fa fa-search"></i>
+             </button>
+            </div>
+          </div>
+        </div>
+        <%- include('../partials/friendList', {friends: friends, onlineUsers: data.online_users}); %>
       </div>
       <div class="right-wrap">
         <%- include('../partials/chatInterface', {friend: {friends}, chats:

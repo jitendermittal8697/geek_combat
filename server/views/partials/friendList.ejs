@@ -1,4 +1,4 @@
-<ul class="friend-wrapper">
+<ul class="friend-wrapper" id="newers-list">
   <% if (friends != undefined ) { %>
     <% friends.forEach(function(friend){ %>
       <%- include('friend', {friend: friend, onlineUsers: onlineUsers, usersContacted: usersContacted}); %>

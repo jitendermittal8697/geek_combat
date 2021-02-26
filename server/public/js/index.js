@@ -2,6 +2,23 @@ var socket = io({ transports: ["websocket"], upgrade: false });
 socket.emit("connecting", { uuid: $(".user-profile").data("uuid") });
 var upload;
 
+function searchNewers() {
+    var input, filter, ul, li, a, i, txtValue;
+    input = document.getElementById("newers_search");
+    filter = input.value.toUpperCase();
+    ul = document.getElementById("newers-list");
+    li = ul.getElementsByTagName("li");
+    for (i = 0; i < li.length; i++) {
+        a = li[i].getElementsByClassName("name")[0];
+        txtValue = a.textContent || a.innerText;
+        if (txtValue.toUpperCase().indexOf(filter) > -1) {
+            li[i].style.display = "";
+        } else {
+            li[i].style.display = "none";
+        }
+    }
+}
+
 function prepareTextMsgBubble(data) {
     return (
         `<div class="msg ` +
@@ -444,3 +461,8 @@ $(document).on("DOMSubtreeModified", ".custom-file-container", function () {
         $(".custom-file-container").hide()
     }
 });
+
+$(document).on('input', '#newers_search', function () {
+    console.log('abc')
+    searchNewers()
+})
