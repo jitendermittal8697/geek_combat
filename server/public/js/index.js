@@ -19,6 +19,17 @@ function searchNewers() {
     }
 }
 
+function addEmojiToTextArea() {
+    $(function () {
+        window.emojiPicker = new EmojiPicker({
+            emojiable_selector: '[data-emojiable=true]',
+            assetsPath: 'http://onesignal.github.io/emoji-picker/lib/img/',
+            popupButtonClasses: 'fa fa-smile'
+        });
+        window.emojiPicker.discover();
+    });
+}
+
 function prepareTextMsgBubble(data) {
     return (
         `<div class="msg ` +
@@ -87,7 +98,7 @@ function scrollChatBox() {
 function moveChat(data) {
     let elem = $(`li[data-uuid="${data.uuid}"]`)
     $(elem).find('.last-message').html(data.message.slice(0, 40) + (data.message.length > 40 ? "..." : ""))
-    $(elem).find('.last-message-date').html(new Date().getHours().toString().padStart(2, "0")+':'+new Date().getMinutes().toString().padStart(2, "0"))
+    $(elem).find('.last-message-date').html(new Date().getHours().toString().padStart(2, "0") + ':' + new Date().getMinutes().toString().padStart(2, "0"))
     $(elem).detach().prependTo('.friend-wrapper');
 }
 
@@ -304,7 +315,7 @@ var appendTextMessageBubble = function (data) {
         txt_msg: data.message,
     });
     $(`li[data-uuid="${data.senderUuid}"] .friend-chat-head`).css('font-weight', 'bolder');
-    moveChat({message: data.message, uuid: data.senderUuid})
+    moveChat({ message: data.message, uuid: data.senderUuid })
 };
 
 var appendFileMessageBubble = function (data) {
@@ -313,7 +324,7 @@ var appendFileMessageBubble = function (data) {
         username: capitalizeText(data.name),
         file_msg: data.message,
     });
-    moveChat({message: data.message, uuid: data.senderUuid})
+    moveChat({ message: data.message, uuid: data.senderUuid })
 };
 
 socket.on('new_user_online', updateUserOnlineStatus);
@@ -329,6 +340,7 @@ var sendMessage = function (data) {
                 "content-type": "application/json",
             },
             data: JSON.stringify(data),
+            async: false,
             dataType: "json",
             success: function (result) {
                 $(".right-wrap").html(result.html);
@@ -354,6 +366,7 @@ $(document).on("click", "li.friend-list", function (evt) {
             },
         },
     });
+    addEmojiToTextArea()
 });
 
 $(document).on("click", ".msger-send-btn", function (evt) {

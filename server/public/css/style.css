@@ -34,6 +34,7 @@
   width: 35%;
   height: 100%;
   min-width: 350px;
+  border-right: 2px solid lavender;
 }
 
 .right-wrap {
@@ -81,6 +82,12 @@
   overflow: scroll;
   overflow-x: hidden;
   max-height: calc(100% - 80px);
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.friend-wrapper::-webkit-scrollbar {
+  display: none;
 }
 
 .friend-list {
@@ -202,11 +209,14 @@
   border: none;
   border-radius: 3px;
   font-size: 1em;
+  position: relative !important;
+  bottom: -19px !important;
 }
 .msger-input {
   flex: 1;
   background: #ddd;
   padding: 12px;
+  height: 45px;
 }
 .msger-send-btn {
   margin-left: 10px;
@@ -317,7 +327,7 @@
   border: 2px solid #b3b3c5;
   border-right: none;
   padding: 5px 5px 5px 25px;
-  height: 25px;
+  height: 39px;
   border-radius: 50px 0 0 50px;
   outline: none;
   -webkit-appearance: none;
@@ -335,4 +345,31 @@
   font-size: 20px;
   border-left: none;
   outline: none;
+}
+
+.emoji-picker-icon {
+  cursor: pointer;
+  position: relative;
+  right: 35px;
+  top: 10px;
+  font-size: 25px;
+}
+
+.emoji-menu .emoji-items-wrap {
+  overflow-x: hidden;
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.emoji-menu {
+  right: 130px;
+  bottom: 75px;
+}
+
+.emoji-items-wrap::-webkit-scrollbar {
+  display: none;
+}
+
+#file-upload {
+  margin-left: -20px;
 }
