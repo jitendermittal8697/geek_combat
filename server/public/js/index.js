@@ -173,6 +173,13 @@ function hideSpeechInput(params) {
     $('.speech_to_text').hide()
 }
 
+function userSignout() {
+    console.log('signing off')
+    socket.emit('user_disconnect')
+    console.log('reload')
+    document.location.reload()
+}
+
 function addAttributeToSpeechControls(action) {
     if (action) {
         $('.stt-send-btn').attr("disabled", true)
@@ -442,6 +449,7 @@ $(document).on("click", ".stt-edit-btn", editSpeechInput);
 $(document).on("click", ".stt-send-btn", sendSpeechInput);
 $(document).on("click", ".microphone", startButton);
 $(document).on("click", ".stt-close-btn", hideSpeechInput);
+$(document).on("click", ".signout", userSignout);
 
 var refreshMessageList = function () {
     $.ajax({

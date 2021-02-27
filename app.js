@@ -192,6 +192,21 @@ io.on('connection', (socket) => {
         io.to(receiverSocketID).emit('trigger_file_message', { name: senderName, message: msg, type: msgType, senderUuid: senderUuid });
     })
 
+    socket.on('user_disconnect', async ()=>{
+        if (!_.isEmpty(online_users)) {
+            let disconnectedUuid;
+            for (const uuid in online_users) {
+                if (socket.id == online_users[uuid]["socket_id"]) {
+                    disconnectedUuid = online_users[uuid]["uuid"];
+                }
+            }
+
+            updateLastLogin(disconnectedUuid)
+            updateFriendListOrder(disconnectedUuid)
+            socket.broadcast.emit('disconnect_client', {});
+            socket.disconnect(true)
+        }
+    })
 
     socket.on('disconnect', async () => {
 

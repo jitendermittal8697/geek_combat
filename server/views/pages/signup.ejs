@@ -44,12 +44,15 @@
             </div>
           </div>
           <label for="username">Full name</label>
-          <input class="form-styling" type="text" name="username" placeholder="" />
+          <input class="form-styling" type="text" name="username" placeholder="Enter your Name" required/>
           <label for="email">Email</label>
-          <input class="form-styling" type="email" name="email" placeholder="" />
+          <input class="form-styling" type="email" name="email" placeholder="Enter email" required />
           <label for="password">Password</label>
-          <input class="form-styling" type="password" name="password" placeholder="" />
-          <a class="btn-signup">Sign Up</a>
+          <input class="form-styling" type="password" name="password" placeholder="Password Here" required />
+          <div class="btn-animate">
+            <button type="submit" class="signupbtn" hidden>Sign Up</button>
+            <a class="btn-signup">Sign Up</a>
+          </div>
         </form>
       </div>
 
@@ -91,6 +94,10 @@
     });
 
     $('.btn-signin').click(function (params) {
+      $('.signupbtn').trigger('click')
+    })
+
+    $('.btn-signup').click(function (params) {
       $('.signupbtn').trigger('click')
     })
 
